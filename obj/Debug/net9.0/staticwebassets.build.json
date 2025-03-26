@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "gnc9lLuikewcGQCLGHaSDKdEhA4EcdYsv3TPe9IAkOE=",
+  "Source": "foodOrderingApp",
+  "BasePath": "_content/foodOrderingApp",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
