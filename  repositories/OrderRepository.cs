@@ -49,9 +49,17 @@ namespace foodOrderingApp. repositories
 
 
             };
-            _context.Orders.Add(order);
+            _context.Orders.Add(order); _context.Orders.Add(order);
             _context.SaveChanges();
             return new Order();
+        }
+
+        public IEnumerable<Order> GetOrders(Guid restaurantOwnerId)
+        {
+            return _context.Orders
+                .Include(o => o.Restaurant)
+                .Where(o =>o.Restaurant!=null && o.Restaurant.OwnerId == restaurantOwnerId)
+                .ToList();
         }
     }
 }
