@@ -36,7 +36,7 @@ namespace foodOrderingApp.controllers
 
             Console.WriteLine("userid {0}", userIdClaim.Value);
 
-           if( Guid.TryParse(userIdClaim.Value,out Guid userId)){
+           if( !Guid.TryParse(userIdClaim.Value,out Guid userId)){
             throw new AppException("Invalid Id Format",HttpStatusCode.BadRequest);
            }
 
@@ -50,6 +50,28 @@ namespace foodOrderingApp.controllers
            return Ok(new ApiResponse<Order>(true,order,"Order Placed Sucessfully"));
 
 
+        }
+
+        [Authorize]
+        [Authorize (Roles ="Owner")]
+        [HttpGet]
+
+        public ActionResult GetOrders(){
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
+            }
+
+            Console.WriteLine("userid {0}", userIdClaim.Value);
+
+            if (!Guid.TryParse(userIdClaim.Value, out Guid ownerId))
+            {
+                throw new AppException("Invalid Id Format", HttpStatusCode.BadRequest);
+            }
+            var orders=_orderRepository.GetOrders(ownerId);
+            return Ok(new ApiResponse<IEnumerable<Order>>(true,orders));
         }
         
     }

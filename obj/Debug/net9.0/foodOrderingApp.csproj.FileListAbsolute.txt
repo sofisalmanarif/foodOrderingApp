@@ -140,3 +140,4 @@
 /home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Microsoft.IdentityModel.Tokens.dll
 /home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/System.IdentityModel.Tokens.Jwt.dll
+/home/salman/Desktop/internship/foodOrderingApp/obj/Debug/net9.0/foodOrderingApp.sourcelink.json

@@ -33,6 +33,11 @@ namespace foodOrderingApp.models
 
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 
+        public Restaurant? Restaurant { get; set; }
+        public User? User {get;set;}
+
+        public Address? Address {get;set;}
+
         // Helper to Get Enum
         public OrderStatus GetOrderStatus()
         {

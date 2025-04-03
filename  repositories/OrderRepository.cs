@@ -57,9 +57,8 @@ namespace foodOrderingApp. repositories
         public IEnumerable<Order> GetOrders(Guid restaurantOwnerId)
         {
             return _context.Orders
-                .Include(o => o.Restaurant)
-                .Where(o =>o.Restaurant!=null && o.Restaurant.OwnerId == restaurantOwnerId)
-                .ToList();
+    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId)
+    .ToList();
         }
     }
 }

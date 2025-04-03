@@ -26,6 +26,7 @@ namespace foodOrderingApp.models
         public User? Owner { get; set; }
         [JsonIgnore]
         public List<MenuItem>? MenuItems { get; set; }
+        public ICollection<Order>? Orders { get; set; }
 
 
     }
