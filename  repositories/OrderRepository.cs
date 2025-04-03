@@ -56,9 +56,34 @@ namespace foodOrderingApp. repositories
 
         public IEnumerable<Order> GetOrders(Guid restaurantOwnerId)
         {
-            return _context.Orders
+            return _context.Orders.Include(o=>o.OrderItems)
     .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId)
     .ToList();
+        }
+
+        public string ProcessOrder(Guid orderId)
+        {
+            var order = _context.Orders.Find(orderId);
+            if(order ==null){
+                throw new KeyNotFoundException("Invalid Order Id");
+            }
+            if(order.GetOrderStatus() == Order.OrderStatus.Deliverd){
+                return "Order is Already Delivered";
+            }
+            if(order.GetOrderStatus() ==Order.OrderStatus.Pending){
+                order.SetOrderStatus(Order.OrderStatus.Processing);
+            }
+             else if (order.GetOrderStatus() == Order.OrderStatus.Processing)
+            {
+                order.SetOrderStatus(Order.OrderStatus.Shipped);
+            }
+            else if (order.GetOrderStatus() == Order.OrderStatus.Shipped)
+            {
+                order.SetOrderStatus(Order.OrderStatus.Deliverd);
+            }
+            _context.Update(order);
+            _context.SaveChanges();
+            return $"Order is {order.GetOrderStatus()}";
         }
     }
 }

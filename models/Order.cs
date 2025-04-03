@@ -12,7 +12,8 @@ namespace foodOrderingApp.models
         {
             Pending,
             Processing,
-            Completed,
+            Shipped,
+            Deliverd,
             Cancelled
         }
         public Guid Id { get; set; } = Guid.NewGuid();

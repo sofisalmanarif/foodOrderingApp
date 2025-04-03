@@ -7,5 +7,7 @@ namespace foodOrderingApp.interfaces
     {
         Order Add(OrderDto newOrder,Guid userId);
         IEnumerable<Order> GetOrders(Guid restaurantOwnerId);
+
+        string ProcessOrder(Guid orderId);
     }
 }

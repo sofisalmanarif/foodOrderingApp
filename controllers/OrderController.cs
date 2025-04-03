@@ -73,6 +73,22 @@ namespace foodOrderingApp.controllers
             var orders=_orderRepository.GetOrders(ownerId);
             return Ok(new ApiResponse<IEnumerable<Order>>(true,orders));
         }
+
+        [HttpPatch("{id}")]
+        public ActionResult ProcessOrder(string id){
+            if(string.IsNullOrEmpty(id)){
+                throw new AppException("No OrderId passed in params",HttpStatusCode.BadRequest);
+            }
+
+            if(!Guid.TryParse(id,out Guid orderId)){
+                throw new AppException("Please provide id in Correct Format", HttpStatusCode.BadRequest);
+
+            }
+
+            string msg = _orderRepository.ProcessOrder(orderId);
+
+            return Ok(new ApiResponse(true ,msg));
+        }
         
     }
 }
