@@ -108,5 +108,24 @@ namespace foodOrderingApp.controllers
             return Ok(new ApiResponse<Object>(true, orderDetails));
         }
 
+
+        [HttpGet("/my-orders")]
+        public ActionResult GetMyOrders(){
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
+            }
+
+            if(!Guid.TryParse(userIdClaim.Value,out Guid userId)){
+                return Unauthorized(new ApiResponse<string>(false, "Invalid user Id Format."));
+
+            }
+            var orders = _orderRepository.MyOrders(userId);
+
+            return Ok(new ApiResponse<object>(true,orders));
+        }
+
     }
 }
