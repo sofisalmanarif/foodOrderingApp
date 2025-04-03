@@ -25,5 +25,14 @@ namespace foodOrderingApp.models
 
         [JsonIgnore]
         public Order? Order { get; set; }
+
+        // public MenuItem? MenuItem {get;set;}
+        // ✅ Navigation Property for MenuItem
+        [JsonIgnore]
+        public MenuItem? MenuItem { get; set; }
+
+        // ✅ Navigation Property for Variant (if applicable)
+        [JsonIgnore]
+        public MenuItemVarient? Variant { get; set; }
     }
 }

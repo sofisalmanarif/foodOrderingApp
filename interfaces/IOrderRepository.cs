@@ -9,5 +9,6 @@ namespace foodOrderingApp.interfaces
         IEnumerable<Order> GetOrders(Guid restaurantOwnerId);
 
         string ProcessOrder(Guid orderId);
+        Object OrderDetails( Guid orderId);
     }
 }

@@ -89,6 +89,24 @@ namespace foodOrderingApp.controllers
 
             return Ok(new ApiResponse(true ,msg));
         }
-        
+        [HttpGet("{id}")]
+        public ActionResult OrderDetails(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new AppException("No OrderId passed in params", HttpStatusCode.BadRequest);
+            }
+
+            if (!Guid.TryParse(id, out Guid orderId))
+            {
+                throw new AppException("Please provide id in Correct Format", HttpStatusCode.BadRequest);
+
+            }
+
+            var orderDetails = _orderRepository.OrderDetails(orderId);
+
+            return Ok(new ApiResponse<Object>(true, orderDetails));
+        }
+
     }
 }

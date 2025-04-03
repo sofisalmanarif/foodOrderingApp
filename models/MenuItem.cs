@@ -34,6 +34,6 @@ namespace foodOrderingApp.models
         [JsonIgnore]
         public Restaurant? Restaurant { get; set; }
         [JsonIgnore]
-        public Category? Categories { get; set; }
+        public Category? Category { get; set; }
     }
 }

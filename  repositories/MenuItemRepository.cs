@@ -97,8 +97,8 @@ namespace foodOrderingApp.repositories
         {
             var menu = _context.MenuItems
                 .Where(item => item.RestaurantId == restaurantId)
-                .Include(item => item.Categories)
-                .GroupBy(item => item.Categories.Name)
+                .Include(item => item.Category)
+                .GroupBy(item => item.Category.Name)
                 .Select(group => new
                 {
                     CategoryName = group.Key,

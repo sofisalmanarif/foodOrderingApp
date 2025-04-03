@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using foodOrderingApp.data;
@@ -11,9 +12,11 @@ using foodOrderingApp.data;
 namespace foodOrderingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250403063212_changes_in_order_table")]
+    partial class changes_in_order_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,6 +223,9 @@ namespace foodOrderingApp.Migrations
                     b.Property<Guid>("ItemId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("MenuItemId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
@@ -231,7 +237,7 @@ namespace foodOrderingApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemId");
+                    b.HasIndex("MenuItemId");
 
                     b.HasIndex("OrderId");
 
@@ -402,9 +408,7 @@ namespace foodOrderingApp.Migrations
                 {
                     b.HasOne("foodOrderingApp.models.MenuItem", "MenuItem")
                         .WithMany()
-                        .HasForeignKey("ItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("MenuItemId");
 
                     b.HasOne("foodOrderingApp.models.Order", "Order")
                         .WithMany("OrderItems")
@@ -414,8 +418,7 @@ namespace foodOrderingApp.Migrations
 
                     b.HasOne("foodOrderingApp.models.MenuItemVarient", "Variant")
                         .WithMany()
-                        .HasForeignKey("VariantId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("VariantId");
 
                     b.Navigation("MenuItem");
 
