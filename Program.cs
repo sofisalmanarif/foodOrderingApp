@@ -10,8 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using foodOrderingApp.models;
-// using MyApi.Interfaces;
-// using MyApi.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 // Register the service with Dependency Injection
@@ -62,7 +61,6 @@ builder.Services.AddSwaggerGen(option =>
 
 
 string jwtKey = builder.Configuration["Jwt:Key"]!;
-// Console.WriteLine("keyyyy   "+ jwtKey);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -74,7 +72,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))};
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+        
     });
 
 // Define Authorization Policies
@@ -148,3 +148,12 @@ app.Run();
 
 
 
+
+// Guid? GetLoggedInUsersUserId(){
+//     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+//     if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
+//     {
+//         return null;
+//     }
+//     return userId;
+// }

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Security.Claims;
 using foodOrderingApp.interfaces;
+using foodOrderingApp.middlewares;
 using foodOrderingApp.models;
 using foodOrderingApp.Models;
 using foodOrderingApp.Services;
@@ -49,21 +50,14 @@ namespace foodOrderingApp.controllers
             var menu = _menuItemRepository.GetAll(restaurantId);
             return Ok(new ApiResponse<Object>(true, menu));
         }
+
+        
         [Authorize]
         [Authorize(Roles = "Owner")]
         [HttpDelete("{id}")]
         public ActionResult Delete(string id)
         {
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
-            }
-
-            Console.WriteLine("userid {0}", userIdClaim.Value);
-
-            Guid ownerId = Guid.Parse(userIdClaim.Value);
+            var ownerId = HttpContext.User.GetUserIdFromClaims();
             if (string.IsNullOrWhiteSpace(id))
             {
                 throw new AppException("No item Id passed in params", HttpStatusCode.BadGateway);

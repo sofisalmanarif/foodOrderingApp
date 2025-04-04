@@ -9,9 +9,9 @@ namespace foodOrderingApp.controllers
 {
     [ApiController]
     [Route("/api/categories")]
-    public class CategoryController:ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly ICategoryReopsitory _categoryRepository ; 
+        private readonly ICategoryReopsitory _categoryRepository;
         public CategoryController(ICategoryReopsitory categoryRepository)
         {
             _categoryRepository = categoryRepository;
@@ -19,22 +19,24 @@ namespace foodOrderingApp.controllers
         }
 
         [HttpPost]
-        public ActionResult Create([FromBody] Category newCategory){
-            if(!ModelState.IsValid){
+        public ActionResult Create([FromBody] Category newCategory)
+        {
+            if (!ModelState.IsValid)
+            {
                 return BadRequest(new { message = "Invalid Category data", errors = ModelState });
             }
-           string msg =  _categoryRepository.Add(newCategory);
+            string msg = _categoryRepository.Add(newCategory);
 
-           return Ok(new ApiResponse(true,msg));
+            return Ok(new ApiResponse(true, msg));
 
         }
         [HttpGet]
         public ActionResult GetAllCategories()
         {
-           
+
             var categories = _categoryRepository.AllCategories();
 
-            return Ok(new ApiResponse<IEnumerable<Category>>(true,categories));
+            return Ok(new ApiResponse<IEnumerable<Category>>(true, categories));
 
         }
         [HttpPut]
@@ -54,9 +56,10 @@ namespace foodOrderingApp.controllers
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                throw new AppException("Please Provide id in params",HttpStatusCode.BadRequest);
+                throw new AppException("Please Provide id in params", HttpStatusCode.BadRequest);
             }
-            if(!Guid.TryParse(id,out Guid categoryId)){
+            if (!Guid.TryParse(id, out Guid categoryId))
+            {
                 throw new AppException("Please Provide Valid id", HttpStatusCode.BadRequest);
             }
             string msg = _categoryRepository.Delete(categoryId);

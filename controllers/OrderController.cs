@@ -115,7 +115,7 @@ namespace foodOrderingApp.controllers
 
             if (userIdClaim == null)
             {
-                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
+                return Unauthorized(new ApiResponse<string>(false, "Login First"));
             }
 
             if(!Guid.TryParse(userIdClaim.Value,out Guid userId)){

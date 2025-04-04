@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Security.Claims;
 using foodOrderingApp.interfaces;
+using foodOrderingApp.middlewares;
 using foodOrderingApp.models;
 using foodOrderingApp.Models;
 using foodOrderingApp.Services;
@@ -64,16 +65,7 @@ namespace foodOrderingApp.controllers
         [HttpGet("profile")]
         public ActionResult Profile()
         {
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
-            }
-
-            Console.WriteLine("userid {0}", userIdClaim.Value);
-
-            Guid userId = Guid.Parse(userIdClaim.Value);
+            Guid userId = HttpContext.User.GetUserIdFromClaims();  //it will get user id
             var user = _userRepository.Profile(userId);
             return Ok(new ApiResponse<object>(true, new{user,restaurant_id = user?.Restaurant?.Id.ToString() ?? ""}));
         }

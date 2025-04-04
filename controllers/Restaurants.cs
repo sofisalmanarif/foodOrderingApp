@@ -6,6 +6,7 @@ using foodOrderingApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using foodOrderingApp.middlewares;
 
 namespace foodOrderingApp.controllers
 {
@@ -118,16 +119,7 @@ namespace foodOrderingApp.controllers
         [HttpPatch("toggle-orders")]
         public ActionResult ToggleOrders()
         {
-            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
-            }
-            if (!Guid.TryParse(userIdClaim.Value, out Guid ownerId))
-            {
-                throw new AppException("Invalid Restaurnat id", HttpStatusCode.BadRequest);
-            }
+            Guid ownerId = HttpContext.User.GetUserIdFromClaims();  //it will get user id
             string res = _restaurantRepository.ToggleOrders(ownerId);
             return Ok(new ApiResponse(true, res));
         }

@@ -6,6 +6,7 @@ using foodOrderingApp.Services;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using foodOrderingApp.middlewares;
 
 namespace foodOrderingApp.controllers
 {
@@ -48,15 +49,7 @@ namespace foodOrderingApp.controllers
         [Authorize]
         [HttpDelete]
         public ActionResult DeleteAddress(){
-             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null)
-            {
-                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
-            }
-            if(!Guid.TryParse(userIdClaim.Value,out Guid userId)){
-                throw new AppException("Invalid token",HttpStatusCode.BadRequest);
-            }
+             var userId = HttpContext.User.GetUserIdFromClaims();
             string msg = _addressRepository.Delete(userId);
 
             return Ok(new ApiResponse(true,msg));
