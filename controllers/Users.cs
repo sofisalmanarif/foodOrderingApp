@@ -71,6 +71,18 @@ namespace foodOrderingApp.controllers
         }
 
         [Authorize]
+        [HttpPatch]
+        public ActionResult Update([FromBody] UpdateUserDto user)
+        {   
+            if(!ModelState.IsValid){
+                return BadRequest(new { message = "Invalid User data", errors = ModelState });
+
+            }
+            Guid userId = HttpContext.User.GetUserIdFromClaims();  //it will get user id
+            string  msg = _userRepository.Update(user,userId);
+            return Ok(new ApiResponse(true, msg));
+        }
+        [Authorize]
         [Authorize(Roles ="Admin")]
         [HttpDelete("{id}")]
         public ActionResult Delete(string id){

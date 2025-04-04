@@ -93,9 +93,24 @@ namespace foodOrderingApp.repositories
             throw new NotImplementedException();
         }
 
-        public string Update(User user)
+        public string Update(UpdateUserDto user,Guid userId)
         {
-            throw new NotImplementedException();
+           if(user==null){
+            throw new ArgumentNullException("User Can't be null");
+           }
+
+           var existingUser = _context.Users.Find(userId);
+
+           if(existingUser ==null){
+            throw new KeyNotFoundException("Invalid User id");
+           }
+           existingUser.Name =user.Name;
+           existingUser.Phone =user.Phone;
+           existingUser.Email =user.Email;
+           _context.Update(existingUser);
+           _context.SaveChanges();
+
+           return $"Profile update Sucessfully";
         }
 
         public string Login(LoginDto user)

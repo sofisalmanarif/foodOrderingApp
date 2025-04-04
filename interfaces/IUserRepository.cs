@@ -11,7 +11,7 @@ namespace foodOrderingApp.interfaces
         User? GetById(Guid id);
         IEnumerable<User> GetAll();
         Guid Add(User user);
-        string Update(User user);
+        string Update(UpdateUserDto user,Guid userId);
         string Delete(Guid id);
         string Login(LoginDto user);
         User? Profile(Guid id);
