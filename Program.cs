@@ -21,6 +21,7 @@ builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRespository>();
 builder.Services.AddScoped<ICategoryReopsitory, CategoryReopsitory>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<Filters>();
 
 
 
