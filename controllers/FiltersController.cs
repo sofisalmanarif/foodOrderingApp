@@ -24,7 +24,7 @@ namespace foodOrderingApp.controllers
                 throw new NullReferenceException("Querry Can't be empty");
             }
 
-            var res = _filters.Search(query);
+            var res = _filters.Search(query.ToLower());
 
             return Ok(new ApiResponse<object>(true,res));
 
