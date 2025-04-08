@@ -14,8 +14,8 @@ public class RestaurantDto
     [Phone(ErrorMessage = "Invalid phone number format.")]
     public string RestaurantPhone { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Image URL is required.")]
-    public string ImageUrl { get; set; } = string.Empty;
+    [Required(ErrorMessage = "Image  is required.")]
+    public IFormFile? Photo { get; set; } 
 
     // User (Owner) fields
     [Required(ErrorMessage = "Owner name is required.")]

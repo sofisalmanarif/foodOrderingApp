@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using foodOrderingApp.middlewares;
+using foodOrderingApp.services;
 
 namespace foodOrderingApp.controllers
 {
@@ -24,15 +25,25 @@ namespace foodOrderingApp.controllers
 
 
         }
-
+        [Consumes("multipart/form-data")]
         [HttpPost]
-        public ActionResult Create([FromBody] RestaurantDto restaurantDto)
+        public ActionResult Create([FromForm] RestaurantDto restaurantDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { message = "Invalid restaurant data", errors = ModelState });
             }
 
+            if (restaurantDto.Photo == null)
+            {
+                throw new AppException("Please Select photo", HttpStatusCode.BadRequest);
+            }
+            string ImageUrl = UploadFiles.Photo(restaurantDto.Photo);
+
+            if(string.IsNullOrWhiteSpace(ImageUrl)){
+                throw new AppException("failed to upload file", HttpStatusCode.InternalServerError);
+
+            }
 
             User owner = new User()
             {
@@ -46,13 +57,18 @@ namespace foodOrderingApp.controllers
 
             Guid userId = _userRepository.Add(owner);
 
+         
 
+            if (restaurantDto.Photo == null)
+            {
+                throw new AppException("Please Select photo", HttpStatusCode.BadRequest);
+            }
             Restaurant restaurant = new Restaurant()
             {
                 RestaurantName = restaurantDto.RestaurantName,
                 RestaurantPhone = restaurantDto.RestaurantPhone,
                 Description = restaurantDto.Description,
-                ImageUrl = restaurantDto.ImageUrl,
+                ImageUrl = ImageUrl,
                 OwnerId = userId,
                 CreatedAt = DateTime.UtcNow,
                 IsVerified = false,
