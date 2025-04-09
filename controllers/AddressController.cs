@@ -22,12 +22,27 @@ namespace foodOrderingApp.controllers
             _addressRepository  = addressRepository;
         }
 
+        [Authorize]
         [HttpPost]
-        public ActionResult Create([FromBody] Address address){
+        public ActionResult Create([FromBody] UserAddressDto address){
             if(!ModelState.IsValid){
                 return BadRequest(new { message = "Invalid address data", errors = ModelState });
             }
-            string msg = _addressRepository.Add(address);
+            if (!Enum.TryParse<AddressType>(address.AddressType, true, out AddressType addressType))
+            {
+                throw new AppException("Invalid Address Type",HttpStatusCode.BadRequest);
+            }
+            var userId = HttpContext.User.GetUserIdFromClaims();
+            Address userAddress = new Address(){
+                AddressType  = addressType,
+                Area =address.Area,
+                City =address.City,
+                Floor = address.Floor,
+                Landmark = address.Landmark,
+                RefId = userId,
+
+            };
+            string msg = _addressRepository.Add(userAddress);
 
             return Ok(new ApiResponse(true,msg));
         }
