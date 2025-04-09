@@ -17,11 +17,14 @@ namespace foodOrderingApp.controllers
     {
         private readonly IResturantRepository _restaurantRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IAddressRepository _addressRepository;
 
-        public Restaurants(IResturantRepository resturantRepository, IUserRepository userRepository)
+
+        public Restaurants(IResturantRepository resturantRepository, IUserRepository userRepository, IAddressRepository addressRepository)
         {
             _restaurantRepository = resturantRepository;
             _userRepository = userRepository;
+            _addressRepository  =addressRepository;
 
 
         }
@@ -77,6 +80,15 @@ namespace foodOrderingApp.controllers
 
             Restaurant createdRestaurant = _restaurantRepository.Add(restaurant); // 🔹 Save restaurant
             // Guid menuId = _MenuRepository.Add(createdRestaurant);
+            Address restaurnatAddress = new Address(){
+                AddressType = AddressType.Restaurant,
+                Area = restaurantDto.Area,
+                City=restaurantDto.City,
+                Floor =restaurantDto.Floor,
+                Landmark =restaurantDto.Landmark,
+                RefId = createdRestaurant.Id,
+            };
+            _addressRepository.Add(restaurnatAddress);
 
 
             return Ok(new ApiResponse<object>(true, new { restaurant_id = restaurant.Id,admin_id =userId }, "Restaurant created successfully!"));

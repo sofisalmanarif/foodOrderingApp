@@ -34,4 +34,13 @@ public class RestaurantDto
     [MinLength(6, ErrorMessage = "Password must be at least 6 characters long.")]
     [DataType(DataType.Password)]
     public string OwnerPassword { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(100, MinimumLength = 3)]
+    public string Area { get; set; } = string.Empty;
+    [Required]
+    public string City { get; set; } = string.Empty;
+    public string Landmark { get; set; } = string.Empty;
+    public string Floor { get; set; } = string.Empty;
+    public string ShopNumber { get; set; } = string.Empty;
 }

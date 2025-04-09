@@ -32,7 +32,7 @@ namespace foodOrderingApp.repositories
 
         public string Delete(Guid userId)
         {
-           var address =  _context.Address.FirstOrDefault(a=>a.UserId==userId);
+           var address =  _context.Address.FirstOrDefault(a=>a.RefId==userId);
 
            if(address==null){
             throw new  KeyNotFoundException("Address Not Found");
@@ -49,7 +49,7 @@ namespace foodOrderingApp.repositories
 
         public Address Get(Guid id)
         {
-            var address = _context.Address.FirstOrDefault(a=>a.UserId ==id);
+            var address = _context.Address.FirstOrDefault(a=>a.RefId ==id);
             if(address==null){
                 throw new KeyNotFoundException("Address Not Found");
             }

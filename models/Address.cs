@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace foodOrderingApp.models
 {
+   public  enum AddressType{
+        Restaurant,
+        Home,
+        Work
+    }
     public class Address
     {
         public Guid Id { get; set; } = Guid.NewGuid();
@@ -20,10 +25,15 @@ namespace foodOrderingApp.models
         public string Floor { get; set; } = string.Empty;
         public string ShopNumber { get; set; } = string.Empty;
 
-        public Guid UserId { get; set; }
+        public Guid RefId { get; set; }
+        public AddressType AddressType { get; set; } = AddressType.Home;
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [JsonIgnore]
-        public User? User { get; set; }
+        // [JsonIgnore]
+        // public User? User { get; set; }
+        // [JsonIgnore]
+        // public Restaurant? Restaurant {get;set;}
     }
-}
+  
+    }

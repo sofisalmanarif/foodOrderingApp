@@ -37,6 +37,10 @@ namespace foodOrderingApp.data
                 .WithMany() // No navigation from Variant to OrderItem
                 .HasForeignKey(oi => oi.VariantId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Address>()
+                .Property(a => a.AddressType)
+                .HasConversion<string>();
         }
 
 
