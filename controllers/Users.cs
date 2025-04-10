@@ -87,10 +87,10 @@ namespace foodOrderingApp.controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(string id){
             if(string.IsNullOrWhiteSpace(id)){
-                throw new AppException("No user Id passed in params", HttpStatusCode.BadGateway);
+               return BadRequest("No user Id passed in params");
             }
 
-            if(Guid.TryParse(id,out Guid userId)){
+            if(!Guid.TryParse(id,out Guid userId)){
                 throw new AppException("Invalid Id Format",HttpStatusCode.BadRequest);
             }
 

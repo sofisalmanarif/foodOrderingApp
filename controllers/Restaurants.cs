@@ -39,14 +39,9 @@ namespace foodOrderingApp.controllers
 
             if (restaurantDto.Photo == null)
             {
-                throw new AppException("Please Select photo", HttpStatusCode.BadRequest);
+                return BadRequest("Please Select photo");
             }
-            string ImageUrl = UploadFiles.Photo(restaurantDto.Photo);
-
-            if(string.IsNullOrWhiteSpace(ImageUrl)){
-                throw new AppException("failed to upload file", HttpStatusCode.InternalServerError);
-
-            }
+         
 
             User owner = new User()
             {
@@ -60,11 +55,14 @@ namespace foodOrderingApp.controllers
 
             Guid userId = _userRepository.Add(owner);
 
-         
 
-            if (restaurantDto.Photo == null)
+
+            string ImageUrl = UploadFiles.Photo(restaurantDto.Photo);
+
+            if (string.IsNullOrWhiteSpace(ImageUrl))
             {
-                throw new AppException("Please Select photo", HttpStatusCode.BadRequest);
+                throw new AppException("failed to upload file", HttpStatusCode.InternalServerError);
+
             }
             Restaurant restaurant = new Restaurant()
             {
@@ -100,16 +98,16 @@ namespace foodOrderingApp.controllers
             Console.Write(id);
             if (string.IsNullOrWhiteSpace(id))
             {
-                throw new AppException("No Restautant id passed in params", HttpStatusCode.BadGateway);
+                return BadRequest("No Restautant id passed in params");
             }
             if (!Guid.TryParse(id, out Guid guidId))
             {
-                throw new AppException("Invalid Restaurnat id", HttpStatusCode.BadRequest);
+                return BadRequest("Invalid Restaurnat id");
             }
             var restaurant = _restaurantRepository.GetById(guidId);
             if (restaurant == null)
             {
-                throw new AppException("Invalid Restaurnat id", HttpStatusCode.BadRequest);
+                return BadRequest("Invalid Restaurnat id");
             }
             return Ok(new ApiResponse<Restaurant>(true, restaurant));
         }
@@ -130,11 +128,11 @@ namespace foodOrderingApp.controllers
             Console.Write(id);
             if (string.IsNullOrWhiteSpace(id))
             {
-                throw new AppException("No Restautant id passed in params", HttpStatusCode.BadGateway);
+                return BadRequest("No Restautant id passed in params");
             }
             if (!Guid.TryParse(id, out Guid guidId))
             {
-                throw new AppException("Invalid Restaurnat id", HttpStatusCode.BadRequest);
+                return BadRequest("Invalid Restaurnat id");
             }
             string res = _restaurantRepository.Verify(guidId);
             return Ok(new ApiResponse(true, res));
@@ -167,11 +165,11 @@ namespace foodOrderingApp.controllers
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                throw new AppException("No Restautant id passed in params", HttpStatusCode.BadGateway);
+                return BadRequest("No Restautant id passed in params");
             }
             if (!Guid.TryParse(id, out Guid restaurantId))
             {
-                throw new AppException("Invalid  id  Format", HttpStatusCode.BadRequest);
+                return BadRequest("Invalid  id  Format");
             }
 
             string message = _restaurantRepository.Delete(restaurantId);
@@ -183,11 +181,11 @@ namespace foodOrderingApp.controllers
         [HttpGet("category/{id}")]
         public ActionResult GetRestautrantsByCategory(string id){
                 if(string.IsNullOrWhiteSpace(id)){
-                    throw new AppException("please provide id in params",HttpStatusCode.BadRequest);
+                return BadRequest("please provide id in params");
                 }
 
                 if(!Guid.TryParse(id,out Guid categoryId)){
-                throw new AppException("please provide id in valid Format", HttpStatusCode.BadRequest);
+                return BadRequest("please provide id in valid Format");
 
             }
             var restaurnats = _restaurantRepository.GetAllRestaurantsByCategory(categoryId);
