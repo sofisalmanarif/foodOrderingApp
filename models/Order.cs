@@ -16,6 +16,16 @@ namespace foodOrderingApp.models
             Delivered,
             Cancelled
         }
+
+        public enum PaymentMethod{
+            cod,
+            online
+        }
+        public enum PaymentStatus
+        {
+            paid,
+            unpaid
+        }
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
@@ -28,8 +38,12 @@ namespace foodOrderingApp.models
         public Guid AddressId { get; set; }
 
         public decimal TotalPrice { get; set; }
-        public string Status { get; set; } = OrderStatus.Pending.ToString();
+        public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
+        public PaymentMethod paymentMethod {get;set;} =PaymentMethod.cod;
+        public PaymentStatus paymentStatus { get; set; } = PaymentStatus.unpaid;
+
+        public string PaymentTransactionId {get;set;} = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
@@ -39,16 +53,6 @@ namespace foodOrderingApp.models
 
         public Address? Address {get;set;}
 
-        // Helper to Get Enum
-        public OrderStatus GetOrderStatus()
-        {
-            return Enum.Parse<OrderStatus>(Status);
-        }
 
-        // Helper to Set Enum
-        public void SetOrderStatus(OrderStatus status)
-        {
-            Status = status.ToString();
-        }
     }
 }

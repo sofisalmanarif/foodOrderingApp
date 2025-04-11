@@ -41,6 +41,17 @@ namespace foodOrderingApp.data
             modelBuilder.Entity<Address>()
                 .Property(a => a.AddressType)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.Status)
+                .HasConversion<string>();
+            modelBuilder.Entity<Order>()
+                .Property(o => o.paymentMethod)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.paymentStatus)
+                .HasConversion<string>();
         }
 
 
