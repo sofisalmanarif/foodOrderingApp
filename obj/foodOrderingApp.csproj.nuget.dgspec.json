@@ -75,9 +75,25 @@
               "target": "Package",
               "version": "[9.0.4, )"
             },
+            "Sentry": {
+              "target": "Package",
+              "version": "[5.5.1, )"
+            },
+            "Sentry.AspNetCore": {
+              "target": "Package",
+              "version": "[3.34.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[7.3.1, )"
+            },
+            "cashfree-pg-sdk-dotnet": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "cashfree_pg": {
+              "target": "Package",
+              "version": "[5.0.6, )"
             }
           },
           "imports": [
@@ -99,7 +115,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.104/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/9.0.105/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -50,8 +50,8 @@ namespace foodOrderingApp.controllers
             {
                 return BadRequest(new { message = "Invalid User data", errors = ModelState });
             }
-            string token = _userRepository.Login(user);
-            return Ok(new ApiResponse<object>(true,new {auth_token=token}));
+            var data = _userRepository.Login(user);
+            return Ok(new ApiResponse<object>(true,data));
         }
         
         [Authorize(Roles ="Admin")]

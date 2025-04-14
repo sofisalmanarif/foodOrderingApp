@@ -25,10 +25,7 @@ namespace foodOrderingApp.repositories
             }
 
             decimal totalPrice = 0;
-            if(newOrder.PaymentMethod!=Order.PaymentMethod.cod)
-           {
-                throw new NotSupportedException("Only COD payments are supported in this flow.");
-            }
+          
                
              // Validate and calculate price
                 foreach (var item in newOrder.OrderItems)
@@ -45,7 +42,26 @@ namespace foodOrderingApp.repositories
                                     : menuItem.Price) * item.Quantity ?? throw new KeyNotFoundException("Invalid variant or item price.");
                 }
 
-                Order order = new Order()
+            Order order;
+            if (newOrder.PaymentMethod != Order.PaymentMethod.cod && !string.IsNullOrWhiteSpace(newOrder.PaymentTransactionId))
+            {
+                order = new Order()
+                {
+                    UserId = userId,
+                    RestaurantId = newOrder.RestaurantId,
+                    AddressId = newOrder.AddressId,
+                    OrderItems = newOrder.OrderItems,
+                    paymentMethod = newOrder.PaymentMethod,
+                    PaymentTransactionId = newOrder.PaymentTransactionId,
+                    paymentStatus = Order.PaymentStatus.paid,
+                    TotalPrice = totalPrice,
+
+                };
+
+            }
+            
+            else {
+                order = new Order()
                 {
                     UserId = userId,
                     RestaurantId = newOrder.RestaurantId,
@@ -54,7 +70,8 @@ namespace foodOrderingApp.repositories
                     TotalPrice = totalPrice,
 
                 };
-                _context.Orders.Add(order); _context.Orders.Add(order);
+            }
+                _context.Orders.Add(order);
                 _context.SaveChanges();
             return order;
             

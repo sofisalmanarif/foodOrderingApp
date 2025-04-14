@@ -88,9 +88,17 @@ namespace foodOrderingApp.repositories
             return _context.Users.AsNoTracking().ToList();
         }
 
-        public User? GetById(Guid id)
+        public User GetById(Guid id)
         {
-            throw new NotImplementedException();
+            var user = _context.Users
+                  .Include(u => u.Restaurant)
+                  .FirstOrDefault(u => u.Id == id);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("user Not Found");
+            }
+            return user;
         }
 
         public string Update(UpdateUserDto user,Guid userId)
@@ -113,7 +121,7 @@ namespace foodOrderingApp.repositories
            return $"Profile update Sucessfully";
         }
 
-        public string Login(LoginDto user)
+        public object Login(LoginDto user)
         {
             var foundUser = _context.Users.Include(u => u.Restaurant).FirstOrDefault(u => u.Email == user.Email) ;
             if (foundUser == null )
@@ -131,7 +139,7 @@ namespace foodOrderingApp.repositories
             }
             
             string token = GenerateJwtToken(foundUser.Id, foundUser.Role);
-            return token;
+            return new {auth_token=token,Role=foundUser.Role};
 
         }
 

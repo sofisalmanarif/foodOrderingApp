@@ -11,34 +11,53 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using foodOrderingApp.models;
 using System.Text.Json.Serialization;
-
+using foodOrderingApp.obj;
+using foodOrderingApp.services;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 // Register the service with Dependency Injection
-builder.Services.AddDbContext<AppDbContext>(options=>options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IResturantRepository, RestaurantRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMenuItemRepository, MenuItemRepository>();
 builder.Services.AddScoped<IAddressRepository, AddressRespository>();
 builder.Services.AddScoped<ICategoryReopsitory, CategoryReopsitory>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IPayment, CashfreePayment>();
 builder.Services.AddScoped<Filters>();
 
 
 
 
-
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000")
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+        });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerGen(option =>
 {
-    option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "FoodOrdering API", Version = "v1" });
     // var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     // option.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -81,7 +100,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
-        
+
     });
 
 // Define Authorization Policies
@@ -136,6 +155,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+       Path.Combine(builder.Environment.ContentRootPath, "uploads")
+    ),
+    RequestPath = "/uploads"
+});
+// Use CORS before other middleware
+app.UseCors("AllowReactApp");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -153,14 +182,3 @@ app.Use(async (context, next) =>
 app.Run();
 
 
-
-
-
-// Guid? GetLoggedInUsersUserId(){
-//     var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-//     if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out Guid userId))
-//     {
-//         return null;
-//     }
-//     return userId;
-// }
