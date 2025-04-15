@@ -2,7 +2,8 @@ namespace foodOrderingApp.Models
 {
     public class DiscountCoupons
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
+
 
         public string Code { get; set; } =string.Empty;
 

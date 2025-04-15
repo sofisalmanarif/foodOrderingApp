@@ -12,8 +12,8 @@ using foodOrderingApp.data;
 namespace foodOrderingApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250415055808_discount_coupons")]
-    partial class discount_coupons
+    [Migration("20250415072925_newmigrations")]
+    partial class newmigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,9 @@ namespace foodOrderingApp.Migrations
 
             modelBuilder.Entity("foodOrderingApp.Models.DiscountCoupons", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
