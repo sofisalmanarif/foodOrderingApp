@@ -32,5 +32,12 @@ namespace foodOrderingApp.controllers
 
 
         }
+
+        [HttpGet]
+        public ActionResult AllCoupons(){
+           var coupons =  _discountCouponRepository.AllCoupons();
+            return Ok(new foodOrderingApp.Models.ApiResponse<IEnumerable<DiscountCoupons>>(true, coupons));
+
+        }
     }
 }

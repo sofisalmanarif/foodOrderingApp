@@ -17,6 +17,16 @@ namespace foodOrderingApp. repositories
             _context =context;
             
         }
+
+        public IEnumerable<DiscountCoupons> AllCoupons()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var coupons = _context.DiscountCoupons
+                .Where(dc => dc.ValidTill > today)
+                .ToList(); 
+            return coupons;
+        }
+
         public string Create(DiscountCouponDto coupon)
         {
            var existingCoupon =  _context.DiscountCoupons.FirstOrDefault(d=>d.Code ==coupon.Code);
