@@ -39,5 +39,17 @@ namespace foodOrderingApp.controllers
             return Ok(new foodOrderingApp.Models.ApiResponse<IEnumerable<DiscountCoupons>>(true, coupons));
 
         }
+
+        [HttpPost]
+        [Route("/verify")]
+        public ActionResult VerifyCoupon([FromBody] VerifyCouponDto coupon){
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid Coupon data", errors = ModelState });
+            }
+
+           float discount =  _discountCouponRepository.Verify(coupon);
+           return Ok(new {message =$"You Saved {discount}rs ",discount});
+        }
     }
 }

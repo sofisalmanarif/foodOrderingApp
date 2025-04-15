@@ -11,5 +11,6 @@ namespace foodOrderingApp.interfaces
     {
         string Create(DiscountCouponDto coupon);
         IEnumerable<DiscountCoupons> AllCoupons();
+        float Verify(VerifyCouponDto coupon);
     }
 }

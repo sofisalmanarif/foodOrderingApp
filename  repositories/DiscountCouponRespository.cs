@@ -22,7 +22,7 @@ namespace foodOrderingApp. repositories
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
             var coupons = _context.DiscountCoupons
-                .Where(dc => dc.ValidTill > today)
+                .Where(dc => dc.ValidTill >= today)
                 .ToList(); 
             return coupons;
         }
@@ -44,6 +44,27 @@ namespace foodOrderingApp. repositories
             _context.DiscountCoupons.Add(newCoupon );
             _context.SaveChanges();
             return $"Coupon created successfully - [{newCoupon.Code}]";
+        }
+
+        public float Verify(VerifyCouponDto coupon)
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+           var existingCoupon =  _context.DiscountCoupons.FirstOrDefault(cp=>cp.Code ==coupon.Code && cp.ValidTill>=today);
+
+           if(existingCoupon==null){
+                throw new InvalidOperationException("The coupon is either invalid or has expired.");
+
+            }
+            if(!(existingCoupon.MinOrderValue <= coupon.CartAmount)){
+                throw new InvalidOperationException($"This coupon requires a minimum cart value of {existingCoupon.MinOrderValue} ");
+            }
+
+            if(existingCoupon.Type == DiscountType.Percentage){
+                return   (existingCoupon.DiscountValue / 100) * coupon.CartAmount;
+            }
+            else{
+                return existingCoupon.DiscountValue;
+            }
         }
     }
 }
