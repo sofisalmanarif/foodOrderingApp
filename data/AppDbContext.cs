@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using foodOrderingApp.models;
+using foodOrderingApp.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace foodOrderingApp.data
@@ -21,6 +22,9 @@ namespace foodOrderingApp.data
         public DbSet<MenuItemVarient> MenuItemVarients { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<DiscountCoupons> DiscountCoupons { get; set; }
+
+
 
 
 
@@ -52,6 +56,9 @@ namespace foodOrderingApp.data
             modelBuilder.Entity<Order>()
                 .Property(o => o.paymentStatus)
                 .HasConversion<string>();
+            modelBuilder.Entity<DiscountCoupons>()
+              .Property(dc=>dc.Type)
+              .HasConversion<string>();
         }
 
 

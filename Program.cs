@@ -25,6 +25,8 @@ builder.Services.AddScoped<IAddressRepository, AddressRespository>();
 builder.Services.AddScoped<ICategoryReopsitory, CategoryReopsitory>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IPayment, CashfreePayment>();
+builder.Services.AddScoped<IDiscountCouponRepository, DiscountCouponRespository>();
+
 builder.Services.AddScoped<Filters>();
 
 
