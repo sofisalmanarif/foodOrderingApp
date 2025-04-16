@@ -28,13 +28,13 @@ namespace foodOrderingApp.controllers
             if(!ModelState.IsValid){
                 return BadRequest(new { message = "Invalid address data", errors = ModelState });
             }
-            if (!Enum.TryParse<AddressType>(address.AddressType, true, out AddressType addressType))
-            {
-                throw new AppException("Invalid Address Type",HttpStatusCode.BadRequest);
-            }
+            // if (!Enum.TryParse<AddressType>(address.AddressType, true, out AddressType addressType))
+            // {
+            //     throw new AppException("Invalid Address Type",HttpStatusCode.BadRequest);
+            // }
             var userId = HttpContext.User.GetUserIdFromClaims();
             Address userAddress = new Address(){
-                AddressType  = addressType,
+                AddressType  =(AddressType) address.AddressType ,
                 Area =address.Area,
                 City =address.City,
                 Floor = address.Floor,

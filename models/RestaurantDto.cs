@@ -15,7 +15,9 @@ public class RestaurantDto
     public string RestaurantPhone { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Image  is required.")]
-    public IFormFile? Photo { get; set; } 
+    public IFormFile? Photo { get; set; }
+    [Required(ErrorMessage = "Image of Valid Diocument is required.")]
+    public IFormFile? ValidDocument { get; set; }
 
     // User (Owner) fields
     [Required(ErrorMessage = "Owner name is required.")]

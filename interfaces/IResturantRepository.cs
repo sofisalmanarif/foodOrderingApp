@@ -8,7 +8,7 @@ namespace foodOrderingApp.interfaces
 {
     public interface IResturantRepository
     {
-        Restaurant? GetById(Guid id);
+        Object? GetById(Guid id);
         IEnumerable<Restaurant> GetAll();
         Restaurant Add(Restaurant restaurant);
         string Update(Restaurant restaurant);

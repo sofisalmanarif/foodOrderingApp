@@ -17,6 +17,8 @@ namespace foodOrderingApp.models
         [Phone]
         public string RestaurantPhone { get; set; } = string.Empty;
         public string ImageUrl { get; set; } = string.Empty;
+        public string ValidDocument { get; set; } = string.Empty;
+
         public bool IsVerified { get; set; } = false; 
         public bool IsActive {get;set;}
         public Guid OwnerId { get; set; }

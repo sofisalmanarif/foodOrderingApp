@@ -6,6 +6,7 @@ using foodOrderingApp.data;
 using foodOrderingApp.interfaces;
 using foodOrderingApp.models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace foodOrderingApp.reprositries
 {
@@ -52,11 +53,44 @@ namespace foodOrderingApp.reprositries
             return _context.Restaurants.Where(r => r.IsVerified == true);
         }
 
-        public Restaurant? GetById(Guid id)
+        public object? GetById(Guid id)
         {
-            return _context.Restaurants.FirstOrDefault(r=>r.Id==id);
+            var restaurant = _context.Restaurants
+                .Include(r => r.Owner)
+                    .ThenInclude(o => o.Address)
+                .FirstOrDefault(r => r.Id == id);
 
+            if (restaurant == null) return null;
+
+            return new
+            {
+                restaurant.Id,
+                restaurant.RestaurantName,
+                restaurant.Description,
+                restaurant.ValidDocument,
+                restaurant.Owner.Phone,
+                Owner = new
+                {
+                    restaurant.Owner.Id,
+                    restaurant.Owner.Name,
+                    restaurant.Owner.Email,
+                    restaurant.Owner.Phone,
+
+                    Address = restaurant.Owner.Address == null ? null : new
+                    {
+                        restaurant.Owner.Address.AddressType,
+                        restaurant.Owner.Address.City,
+                        restaurant.Owner.Address.Landmark,
+                        restaurant.Owner.Address.ShopNumber,
+                        restaurant.Owner.Address.Floor,
+
+
+                    }
+                }
+            };
         }
+
+
 
         public string ToggleOrders(Guid ownerId)
         {

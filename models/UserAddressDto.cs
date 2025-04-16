@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace foodOrderingApp.models
 {
+    public enum UserAddressType{
+        Home,
+        Work,
+    }
     public class UserAddressDto
     {
         [Required]
@@ -16,7 +20,6 @@ namespace foodOrderingApp.models
         public string Landmark { get; set; } = string.Empty;
         public string Floor { get; set; } = string.Empty;
 
-        public Guid RefId { get; set; }
-        public string AddressType { get; set; } =string.Empty ;
+        public UserAddressType AddressType { get; set; } 
     }
 }

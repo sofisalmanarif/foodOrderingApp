@@ -37,11 +37,15 @@ namespace foodOrderingApp.controllers
                 return BadRequest(new { message = "Invalid restaurant data", errors = ModelState });
             }
 
-            if (restaurantDto.Photo == null)
+            if (restaurantDto.Photo == null   )
             {
-                return BadRequest("Please Select photo");
+                return BadRequest("Please Select photos");
             }
-         
+            if (restaurantDto.ValidDocument == null)
+            {
+                return BadRequest("Please Upload Image Of Valid restaurant Document");
+            }
+
 
             User owner = new User()
             {
@@ -58,10 +62,11 @@ namespace foodOrderingApp.controllers
 
 
             string ImageUrl = UploadFiles.Photo(restaurantDto.Photo);
+            string validDocUrl = UploadFiles.Photo(restaurantDto.ValidDocument);
 
-            if (string.IsNullOrWhiteSpace(ImageUrl))
+            if (string.IsNullOrWhiteSpace(ImageUrl) || string.IsNullOrWhiteSpace(validDocUrl))
             {
-                throw new AppException("failed to upload file", HttpStatusCode.InternalServerError);
+                throw new AppException("failed to upload files", HttpStatusCode.InternalServerError);
 
             }
             Restaurant restaurant = new Restaurant()
@@ -70,6 +75,7 @@ namespace foodOrderingApp.controllers
                 RestaurantPhone = restaurantDto.RestaurantPhone,
                 Description = restaurantDto.Description,
                 ImageUrl = ImageUrl,
+                ValidDocument = validDocUrl,
                 OwnerId = userId,
                 CreatedAt = DateTime.UtcNow,
                 IsVerified = false,
@@ -84,7 +90,7 @@ namespace foodOrderingApp.controllers
                 City=restaurantDto.City,
                 Floor =restaurantDto.Floor,
                 Landmark =restaurantDto.Landmark,
-                RefId = createdRestaurant.Id,
+                RefId = owner.Id,
             };
             _addressRepository.Add(restaurnatAddress);
 
@@ -109,7 +115,7 @@ namespace foodOrderingApp.controllers
             {
                 return BadRequest("Invalid Restaurnat id");
             }
-            return Ok(new ApiResponse<Restaurant>(true, restaurant));
+            return Ok(new ApiResponse<object>(true, restaurant));
         }
        
         [HttpGet]
