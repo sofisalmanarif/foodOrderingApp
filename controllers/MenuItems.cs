@@ -5,9 +5,11 @@ using foodOrderingApp.interfaces;
 using foodOrderingApp.middlewares;
 using foodOrderingApp.models;
 using foodOrderingApp.Models;
+using foodOrderingApp.services;
 using foodOrderingApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace foodOrderingApp.controllers
 {
@@ -22,18 +24,61 @@ namespace foodOrderingApp.controllers
             _menuItemRepository = menuItemRepository;
         }
 
+        [Consumes("multipart/form-data")]
         [HttpPost]
-        public ActionResult Create([FromBody] MenuItemDto newMenuItem)
+        public ActionResult Create([FromForm] MenuItemRequest newMenuItem)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { message = "Invalid Menu item data", errors = ModelState });
             }
-            MenuItem createdMenuItem = _menuItemRepository.Add(newMenuItem);
+
+            if (newMenuItem.Photo == null)
+            {
+                return BadRequest("Please select a photo");
+            }
+
+            List<FoodItemVariantRequest> variants;
+
+            try
+            {
+                variants = JsonConvert.DeserializeObject<List<FoodItemVariantRequest>>(newMenuItem.VariantsJson);
+                if (variants == null || variants.Count == 0)
+                {
+                    return BadRequest("Variants list cannot be empty.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid JSON in VariantsJson",
+                    raw = newMenuItem.VariantsJson,
+                    error = ex.Message
+                });
+            }
+
+            // Simulate image upload
+            string imageUrl = UploadFiles.Photo(newMenuItem.Photo);
+
+            MenuItemDto menuItem = new MenuItemDto
+            {
+                Name = newMenuItem.Name,
+                Category = newMenuItem.Category,
+                ImageUrl = imageUrl,
+                IsCustomizable = newMenuItem.IsCustomizable,
+                RestaurantId = newMenuItem.RestaurantId,
+                Description = newMenuItem.Description,
+                Price = newMenuItem.Price,
+                Variants = variants
+            };
+
+            MenuItem createdMenuItem = _menuItemRepository.Add(menuItem);
 
             return StatusCode(201, new ApiResponse(true, $"{createdMenuItem.Name} added successfully"));
         }
+
+
 
         [HttpGet("{id}")]
         public ActionResult GetMenu(string id)
