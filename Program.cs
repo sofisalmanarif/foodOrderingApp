@@ -157,6 +157,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+if (!Directory.Exists(uploadPath))
+{
+    Directory.CreateDirectory(uploadPath);
+    Console.WriteLine($"✅ Created /upload folder at: {uploadPath}");
+}
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
@@ -181,6 +188,8 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsync("{\"status\": 404, \"message\": \"Endpoint not found\"}");
     }
 });
+
+
 app.Run();
 
 
