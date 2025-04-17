@@ -23,6 +23,10 @@ namespace foodOrderingApp.repositories
                 throw new ArgumentNullException(nameof(newCategory), "Category can't be empty");
             }
 
+            var existingCategory = _context.Categories.FirstOrDefault(c=>c.Name == newCategory.Name.ToLower());
+            if(existingCategory !=null){
+                throw new InvalidOperationException("A category with the same Name already exists.");
+            }
 
             _context.Categories.Add(newCategory);
             _context.SaveChanges();
