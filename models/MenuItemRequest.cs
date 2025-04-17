@@ -32,20 +32,18 @@ namespace foodOrderingApp.models
 
         public decimal Price { get; set; }
 
-        // ✅ Receive as JSON string from frontend
-        [Required(ErrorMessage = "VariantsJson is required.")]
         public string VariantsJson { get; set; } = string.Empty;
     }
-        public class FoodItemVariantRequest
-        {
-            [Required(ErrorMessage = "Size is required.")]
-            [MaxLength(20, ErrorMessage = "Size cannot exceed 20 characters.")]
-            public string? Size { get; set; }
+    public class FoodItemVariantRequest
+    {
+        [Required(ErrorMessage = "Size is required.")]
+        [MaxLength(20, ErrorMessage = "Size cannot exceed 20 characters.")]
+        public string? Size { get; set; }
 
-            [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
-            public decimal Price { get; set; }
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
+        public decimal Price { get; set; }
 
-            public bool IsAvailable { get; set; } = true;
-        }
-
+        public bool IsAvailable { get; set; } = true;
     }
+
+}
