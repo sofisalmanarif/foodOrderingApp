@@ -55,5 +55,10 @@ namespace foodOrderingApp.repositories
             }
             return address;
         }
+
+        public IEnumerable<Address> GetUserAddresses(Guid userId)
+        {
+            return _context.Address.Where(a=>a.RefId ==userId);
+        }
     }
 }

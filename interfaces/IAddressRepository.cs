@@ -12,5 +12,7 @@ namespace foodOrderingApp.interfaces
         Address Get(Guid id);
         string Delete(Guid id);
         Address Edit(Address address);
+
+        IEnumerable<Address> GetUserAddresses(Guid userId);
     }
 }

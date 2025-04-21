@@ -32,9 +32,13 @@ namespace foodOrderingApp.controllers
             // {
             //     throw new AppException("Invalid Address Type",HttpStatusCode.BadRequest);
             // }
+            if (!Enum.TryParse<AddressType>(address.AddressType.ToString(), true, out var addressType))
+            {
+                return BadRequest("Invalid Address Type");
+            }
             var userId = HttpContext.User.GetUserIdFromClaims();
             Address userAddress = new Address(){
-                AddressType  =(AddressType) address.AddressType ,
+                AddressType  = addressType,
                 Area =address.Area,
                 City =address.City,
                 Floor = address.Floor,
@@ -69,6 +73,16 @@ namespace foodOrderingApp.controllers
 
             return Ok(new ApiResponse(true,msg));
         }
+
+        [HttpGet]
+        [Authorize]
+        public ActionResult GetUserAddresses()
+        {
+            var userId = HttpContext.User.GetUserIdFromClaims();
+            var addresses = _addressRepository.GetUserAddresses(userId);
+
+            return Ok(new ApiResponse<IEnumerable<Address>>(true, addresses));
         }
+    }
         
     }
