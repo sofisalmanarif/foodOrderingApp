@@ -35,7 +35,7 @@ namespace foodOrderingApp.models
         public Restaurant? Restaurant { get; set; }
         
         [JsonIgnore]
-        public Address? Address {get;set;}
+        public List<Address>? Addresses {get;set;}
 
         public static string Roles(int r)
         {

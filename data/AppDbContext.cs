@@ -59,6 +59,10 @@ namespace foodOrderingApp.data
             modelBuilder.Entity<DiscountCoupons>()
               .Property(dc=>dc.Type)
               .HasConversion<string>();
+            modelBuilder.Entity<Address>()
+                    .HasOne(a => a.User)
+                    .WithMany(o => o.Addresses)
+                    .HasForeignKey(a => a.RefId);
         }
 
 

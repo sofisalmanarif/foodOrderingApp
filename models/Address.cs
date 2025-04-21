@@ -30,8 +30,8 @@ namespace foodOrderingApp.models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // [JsonIgnore]
-        // public User? User { get; set; }
+        [JsonIgnore]
+        public User? User { get; set; }
         // [JsonIgnore]
         // public Restaurant? Restaurant {get;set;}
     }

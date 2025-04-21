@@ -56,11 +56,15 @@ namespace foodOrderingApp.reprositries
         public object? GetById(Guid id)
         {
             var restaurant = _context.Restaurants
-                .Include(r => r.Owner)
-                    .ThenInclude(o => o.Address)
+                .Include(r => r.Owner)  // Include the Owner
+                .ThenInclude(owner => owner.Addresses)  // Include the Addresses related to the Owner
                 .FirstOrDefault(r => r.Id == id);
 
             if (restaurant == null) return null;
+
+            // Filter the addresses to get the one with AddressType = "Restaurant"
+            var restaurantAddress = restaurant.Owner.Addresses?
+                .FirstOrDefault(address => address.AddressType == AddressType.Restaurant);
 
             return new
             {
@@ -71,24 +75,24 @@ namespace foodOrderingApp.reprositries
                 restaurant.Owner.Phone,
                 Owner = new
                 {
-                    restaurant.Owner.Id,
                     restaurant.Owner.Name,
                     restaurant.Owner.Email,
                     restaurant.Owner.Phone,
 
-                    Address = restaurant.Owner.Address == null ? null : new
+                    // Include the address with AddressType "Restaurant" (if it exists)
+                    Address = restaurantAddress == null ? null : new
                     {
-                        restaurant.Owner.Address.AddressType,
-                        restaurant.Owner.Address.City,
-                        restaurant.Owner.Address.Landmark,
-                        restaurant.Owner.Address.ShopNumber,
-                        restaurant.Owner.Address.Floor,
-
-
+                        restaurantAddress.AddressType,
+                        restaurantAddress.City,
+                        restaurantAddress.Landmark,
+                        restaurantAddress.ShopNumber,
+                        restaurantAddress.Floor
                     }
                 }
             };
         }
+
+
 
 
 
