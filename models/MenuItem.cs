@@ -30,6 +30,7 @@ namespace foodOrderingApp.models
         public List<MenuItemVarient>? Variants { get; set; }
 
         public bool IsCustomizable { get; set; } = true;
+        public bool IsAvailable { get; set; } = true;
 
         [JsonIgnore]
         public Restaurant? Restaurant { get; set; }

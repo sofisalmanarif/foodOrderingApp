@@ -31,6 +31,7 @@ namespace foodOrderingApp.models
         public bool IsCustomizable { get; set; }
 
         public decimal Price { get; set; }
+        public bool IsAvailable { get; set; }
 
         public string VariantsJson { get; set; } = string.Empty;
     }

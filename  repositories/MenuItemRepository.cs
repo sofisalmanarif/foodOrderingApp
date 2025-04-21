@@ -50,6 +50,9 @@ namespace foodOrderingApp.repositories
                 Price = !newMenuItem.IsCustomizable ? newMenuItem.Price : (newMenuItem.Variants != null && newMenuItem.Variants.Any()
         ? newMenuItem.Variants[0].Price
         : newMenuItem.Price),
+                IsAvailable = !newMenuItem.IsCustomizable ? newMenuItem.IsAvailable : (newMenuItem.Variants != null && newMenuItem.Variants.Any()
+        ? newMenuItem.Variants[0].IsAvailable
+        : newMenuItem.IsAvailable),
                 Variants = null
             };
 

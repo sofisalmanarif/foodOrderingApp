@@ -28,6 +28,7 @@ namespace foodOrderingApp.models
         public bool IsCustomizable { get; set; }
 
         public decimal Price { get; set; }
+        public bool IsAvailable { get; set; }
 
         public List<FoodItemVariantRequest>? Variants { get; set; }
     }
