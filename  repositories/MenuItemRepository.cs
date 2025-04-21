@@ -156,5 +156,24 @@ namespace foodOrderingApp.repositories
             _context.SaveChanges();
             return existingMenuItem;
         }
+
+        public string UpdateVarient(MenuItemVarient varient)
+        {
+            var existingVarient = _context.MenuItemVarients.FirstOrDefault(v=>v.Id == varient.Id);
+
+            if(existingVarient == null){
+                throw new KeyNotFoundException("Varient not Found");
+            }
+            existingVarient.Id = varient.Id;
+            existingVarient.MenuItemId = varient.MenuItemId;
+            existingVarient.Size = varient.Size;
+            existingVarient.Price = varient.Price;
+            existingVarient.IsAvailable = varient.IsAvailable;
+
+            _context.Update(existingVarient);
+            _context.SaveChanges();
+            return "Update Sucessfull";
+
+        }
     }
 }

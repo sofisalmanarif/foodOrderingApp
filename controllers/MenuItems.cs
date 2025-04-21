@@ -139,7 +139,7 @@ namespace foodOrderingApp.controllers
 
         [Authorize]
         [Authorize(Roles ="Owner")]
-        [HttpPut]
+        [HttpPatch]
         public ActionResult Update(MenuItem menuItem){
             Console.WriteLine("menuitem {0}",menuItem.Name);
             if(!ModelState.IsValid){
@@ -151,6 +151,20 @@ namespace foodOrderingApp.controllers
             return Ok(new ApiResponse<MenuItem>(true,res, $"{res.Name} Updated Sucessfully"));
 
         }
+
+        
+        [HttpPatch("update-varient")]
+        [Authorize(Roles ="Admin")]
+        public ActionResult UpdateVarient(MenuItemVarient varient){
+            if(!ModelState.IsValid){
+                return BadRequest(new{message = "Invalid Data",errors = ModelState});
+            }
+           string msg =  _menuItemRepository.UpdateVarient(varient);
+
+           return Ok(new ApiResponse(true,msg));
+        }
+
+
 
         [HttpGet("item/{id}")]
         public ActionResult GetMenuItemById(string id){

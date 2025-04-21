@@ -15,6 +15,7 @@ namespace foodOrderingApp.interfaces
         string Delete(Guid id,Guid ownerId);
 
         string IsAvailable(Guid id);
+        string UpdateVarient(MenuItemVarient varient);
         
     }
 }
