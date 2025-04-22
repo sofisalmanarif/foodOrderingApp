@@ -25,7 +25,7 @@ namespace foodOrderingApp.models
         public string Floor { get; set; } = string.Empty;
         public string ShopNumber { get; set; } = string.Empty;
 
-        public Guid RefId { get; set; }
+        public Guid? RefId { get; set; }
         public AddressType AddressType { get; set; } = AddressType.Home;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
