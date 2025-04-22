@@ -38,26 +38,28 @@ namespace foodOrderingApp.controllers
                 return BadRequest("Please select a photo");
             }
 
-            List<FoodItemVariantRequest> variants;
+            List<FoodItemVariantRequest> variants =null;
+            if(newMenuItem.IsCustomizable){
 
-            try
-            {
-                variants = JsonConvert.DeserializeObject<List<FoodItemVariantRequest>>(newMenuItem.VariantsJson);
-                if (variants == null || variants.Count == 0)
+                try
                 {
-                    return BadRequest("Variants list cannot be empty.");
+                    variants = JsonConvert.DeserializeObject<List<FoodItemVariantRequest>>(newMenuItem.VariantsJson);
+                    if (variants == null || variants.Count == 0)
+                    {
+                        return BadRequest("Variants list cannot be empty.");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new
+                catch (Exception ex)
                 {
-                    message = "Invalid JSON in VariantsJson",
-                    raw = newMenuItem.VariantsJson,
-                    error = ex.Message
-                });
-            }
+                    return BadRequest(new
+                    {
+                        message = "Invalid JSON in VariantsJson",
+                        raw = newMenuItem.VariantsJson,
+                        error = ex.Message
+                    });
+                }
 
+            }
             // Simulate image upload
             string imageUrl = UploadFiles.Photo(newMenuItem.Photo);
 

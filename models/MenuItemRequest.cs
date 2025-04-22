@@ -33,7 +33,7 @@ namespace foodOrderingApp.models
         public decimal Price { get; set; }
         public bool IsAvailable { get; set; }
 
-        public string VariantsJson { get; set; } = string.Empty;
+        public string? VariantsJson { get; set; } = string.Empty;
     }
     public class FoodItemVariantRequest
     {
