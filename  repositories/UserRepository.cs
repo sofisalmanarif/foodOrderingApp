@@ -46,8 +46,11 @@ namespace foodOrderingApp.repositories
                 issuer: _configuration["Jwt:Issuer"]!,
                 audience: _configuration["Jwt:Audience"]!,
                 claims: claims,
-                expires: DateTime.Now.AddDays(7),
+                expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds);
+                
+
+            Console.WriteLine("validddd {0}", token.ValidTo);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
