@@ -33,7 +33,7 @@ namespace foodOrderingApp.repositories
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-            
+
             new Claim(ClaimTypes.Name, userId.ToString()),
             new Claim(ClaimTypes.Role,Roles(role))
         };
@@ -48,7 +48,7 @@ namespace foodOrderingApp.repositories
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds);
-                
+
 
             Console.WriteLine("validddd {0}", token.ValidTo);
 
@@ -78,7 +78,8 @@ namespace foodOrderingApp.repositories
         public string Delete(Guid id)
         {
             var foundUser = _context.Users.Find(id);
-            if(foundUser == null){
+            if (foundUser == null)
+            {
                 throw new KeyNotFoundException("User Not Found");
             }
             _context.Remove(foundUser);
@@ -104,45 +105,48 @@ namespace foodOrderingApp.repositories
             return user;
         }
 
-        public string Update(UpdateUserDto user,Guid userId)
+        public string Update(UpdateUserDto user, Guid userId)
         {
-           if(user==null){
-            throw new ArgumentNullException("User Can't be null");
-           }
+            if (user == null)
+            {
+                throw new ArgumentNullException("User Can't be null");
+            }
 
-           var existingUser = _context.Users.Find(userId);
+            var existingUser = _context.Users.Find(userId);
 
-           if(existingUser ==null){
-            throw new KeyNotFoundException("Invalid User id");
-           }
-           existingUser.Name =user.Name;
-           existingUser.Phone =user.Phone;
-           existingUser.Email =user.Email;
-           _context.Update(existingUser);
-           _context.SaveChanges();
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("Invalid User id");
+            }
+            existingUser.Name = user.Name;
+            existingUser.Phone = user.Phone;
+            existingUser.Email = user.Email;
+            _context.Update(existingUser);
+            _context.SaveChanges();
 
-           return $"Profile update Sucessfully";
+            return $"Profile update Sucessfully";
         }
 
         public object Login(LoginDto user)
         {
-            var foundUser = _context.Users.Include(u => u.Restaurant).FirstOrDefault(u => u.Email == user.Email) ;
-            if (foundUser == null )
+            var foundUser = _context.Users.Include(u => u.Restaurant).FirstOrDefault(u => u.Email == user.Email);
+            if (foundUser == null)
             {
-                throw new UnauthorizedAccessException("User not found.");
+                throw new UnauthorizedAccessException("Invalid Credentails.");
             }
             bool isPasswordMatched = BCrypt.Net.BCrypt.Verify(user.Password, foundUser.Password);
             if (!isPasswordMatched)
             {
-                throw new KeyNotFoundException("Invalid Credentails");
+                throw new UnauthorizedAccessException("Invalid Credentails");
             }
-            if(foundUser.Role==Role.Owner && foundUser.Restaurant?.IsVerified ==false){
+            if (foundUser.Role == Role.Owner && foundUser.Restaurant?.IsVerified == false)
+            {
                 throw new UnauthorizedAccessException("You are not Approved");
 
             }
-            
+
             string token = GenerateJwtToken(foundUser.Id, foundUser.Role);
-            return new {auth_token=token,Role=foundUser.Role};
+            return new { auth_token = token, role = foundUser.Role };
 
         }
 
@@ -153,11 +157,12 @@ namespace foodOrderingApp.repositories
                     .Include(u => u.Restaurant)
                     .FirstOrDefault(u => u.Id == id);
 
-            if ( user ==null){
+            if (user == null)
+            {
                 throw new KeyNotFoundException("user Not Found");
             }
             return user;
-            
+
         }
         public static string Roles(Role r)
         {

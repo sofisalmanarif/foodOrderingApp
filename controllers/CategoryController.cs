@@ -2,6 +2,7 @@ using System.Net;
 using foodOrderingApp.interfaces;
 using foodOrderingApp.models;
 using foodOrderingApp.Models;
+using foodOrderingApp.services;
 using foodOrderingApp.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,14 +19,25 @@ namespace foodOrderingApp.controllers
 
         }
 
+        [Consumes("multipart/form-data")]
         [HttpPost]
-        public ActionResult Create([FromBody] Category newCategory)
+        public ActionResult Create([FromForm] CategoryRequistModel newCategory)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { message = "Invalid Category data", errors = ModelState });
             }
-            string msg = _categoryRepository.Add(newCategory);
+            if (newCategory.Photo == null)
+            {
+                return BadRequest("Please Select photos");
+            }
+            string ImageUrl = UploadFiles.Photo(newCategory.Photo);
+            Category category = new Category()
+            {
+                Name = newCategory.Name,
+                Photo = ImageUrl,
+            };
+            string msg = _categoryRepository.Add(category);
 
             return Ok(new ApiResponse(true, msg));
 
