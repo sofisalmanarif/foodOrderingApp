@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using foodOrderingApp.data;
 using foodOrderingApp.interfaces;
 using foodOrderingApp.models;
+using Humanizer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 
 namespace foodOrderingApp.repositories
@@ -177,6 +179,38 @@ namespace foodOrderingApp.repositories
                 default:
                     return "Unknown";
             }
+        }
+
+        public string SaveFirebasePushNotificationToken(FirebaseTokenDto firebaseTokenDto)
+        {
+            if (firebaseTokenDto == null || string.IsNullOrEmpty(firebaseTokenDto.FirebaseToken)){
+                return "Invalid token data";
+        }
+
+            var existingUserToken =   _context.FirebaseTokens.FirstOrDefault(ft=>ft.UserId ==firebaseTokenDto.UserId);
+          if(existingUserToken !=null){
+                existingUserToken.FirebaseToken = firebaseTokenDto.FirebaseToken;
+                _context.Update(existingUserToken);
+            }
+            else{
+                FirebaseTokensModel firebaseTokensModel = new FirebaseTokensModel(){
+                    UserId =firebaseTokenDto.UserId,
+                    FirebaseToken=firebaseTokenDto.FirebaseToken
+                };
+                _context.FirebaseTokens.Add(firebaseTokensModel);
+            }
+            _context.SaveChanges();
+            return "Token added sucessfully";
+
+        }
+
+        public string SaveFirebasePushNotificationToken(Guid UserId)
+        {
+            var existingtoken = _context.FirebaseTokens.FirstOrDefault<FirebaseTokensModel>(ft=>ft.UserId==UserId);
+            if(existingtoken==null){
+                throw new KeyNotFoundException("Token not Found");
+            }
+            return existingtoken.FirebaseToken;
         }
     }
 }

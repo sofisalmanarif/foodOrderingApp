@@ -98,5 +98,24 @@ namespace foodOrderingApp.controllers
             return Ok(new ApiResponse(true,msg));
         }
 
+        [Authorize]
+        [HttpPost("/save-firebase-token")]
+        public ActionResult SaveFirebasePushNotificationToken([FromBody] FirebaseTokenRequist firebaseTokenRequist)
+        {
+            Guid userId = HttpContext.User.GetUserIdFromClaims();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { message = "Invalid T data", errors = ModelState });
+
+            }
+            FirebaseTokenDto firebaseTokenDto = new FirebaseTokenDto(){
+                UserId =userId,
+                FirebaseToken = firebaseTokenRequist.FirebaseToken
+            };
+
+            string msg = _userRepository.SaveFirebasePushNotificationToken(firebaseTokenDto);
+            return Ok(new ApiResponse(true, msg));
+        }
+
     }
 }

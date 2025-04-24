@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using foodOrderingApp.data;
 using foodOrderingApp.interfaces;
 using foodOrderingApp.models;
+using foodOrderingApp.services;
 using Microsoft.EntityFrameworkCore;
 
 namespace foodOrderingApp.repositories
@@ -12,9 +13,12 @@ namespace foodOrderingApp.repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly AppDbContext _context;
-        public OrderRepository(AppDbContext context)
+        private readonly FirebaseService _fireBaseService;
+        public OrderRepository(AppDbContext context ,FirebaseService firebaseService)
         {
             _context = context;
+            _fireBaseService =firebaseService;
+
 
         }
         public Order Add(OrderDto newOrder, Guid userId)
@@ -196,6 +200,7 @@ namespace foodOrderingApp.repositories
             {
                 order.Status = Order.OrderStatus.Delivered;
             }
+           
             _context.Update(order);
             _context.SaveChanges();
             return $"Order is {order.Status.ToString()}";

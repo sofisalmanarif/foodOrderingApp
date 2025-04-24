@@ -24,6 +24,8 @@ namespace foodOrderingApp.data
         public DbSet<Order> Orders { get; set; }
         public DbSet<DiscountCoupons> DiscountCoupons { get; set; }
 
+        public DbSet<FirebaseTokensModel>FirebaseTokens {get;set;}
+
 
 
 

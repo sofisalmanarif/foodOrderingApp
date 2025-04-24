@@ -11,9 +11,12 @@ namespace foodOrderingApp.interfaces
         User GetById(Guid id);
         IEnumerable<User> GetAll();
         Guid Add(User user);
-        string Update(UpdateUserDto user,Guid userId);
+        string Update(UpdateUserDto user, Guid userId);
         string Delete(Guid id);
         object Login(LoginDto user);
         User? Profile(Guid id);
+
+        string SaveFirebasePushNotificationToken(FirebaseTokenDto firebaseTokenDto);
+        string SaveFirebasePushNotificationToken(Guid UserId);
     }
 }

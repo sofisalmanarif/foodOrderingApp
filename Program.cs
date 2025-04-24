@@ -14,6 +14,8 @@ using System.Text.Json.Serialization;
 using foodOrderingApp.obj;
 using foodOrderingApp.services;
 using Microsoft.Extensions.FileProviders;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 // Register the service with Dependency Injection
@@ -28,6 +30,7 @@ builder.Services.AddScoped<IPayment, CashfreePayment>();
 builder.Services.AddScoped<IDiscountCouponRepository, DiscountCouponRespository>();
 
 builder.Services.AddScoped<Filters>();
+builder.Services.AddScoped<FirebaseService>();
 
 
 
@@ -148,6 +151,11 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddAuthorization();
 
+// firebase strup
+FirebaseApp.Create(new AppOptions
+{
+    Credential = GoogleCredential.FromFile("./foodorderingapp-f2115-firebase-adminsdk-fbsvc-b8e9e9e42b.json"),
+});
 
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -189,6 +197,8 @@ app.Use(async (context, next) =>
         await context.Response.WriteAsync("{\"status\": 404, \"message\": \"Endpoint not found\"}");
     }
 });
+
+
 
 
 app.Run();
