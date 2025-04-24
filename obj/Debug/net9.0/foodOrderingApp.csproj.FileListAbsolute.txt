@@ -151,3 +151,12 @@
 /home/salman/Desktop/internship/foodOrderingApp/obj/Debug/net9.0/foodOrderingApp.pdb
 /home/salman/Desktop/internship/foodOrderingApp/obj/Debug/net9.0/foodOrderingApp.genruntimeconfig.cache
 /home/salman/Desktop/internship/foodOrderingApp/obj/Debug/net9.0/ref/foodOrderingApp.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/foodorderingapp-f2115-firebase-adminsdk-fbsvc-b8e9e9e42b.json
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/FirebaseAdmin.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Google.Api.Gax.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Google.Api.Gax.Rest.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Google.Apis.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Google.Apis.Auth.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Google.Apis.Core.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/System.Management.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/runtimes/win/lib/net7.0/System.Management.dll

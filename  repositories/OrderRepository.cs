@@ -78,6 +78,13 @@ namespace foodOrderingApp.repositories
 
         }
 
+        public IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId)
+        {
+            return _context.Orders.Include(o => o.OrderItems)
+    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && (o.Status == Order.OrderStatus.Shipped || o.Status ==Order.OrderStatus.Processing))
+    .ToList();
+        }
+
         public IEnumerable<Order> GetOrders(Guid restaurantOwnerId)
         {
             return _context.Orders.Include(o => o.OrderItems)

@@ -15,7 +15,7 @@ namespace foodOrderingApp.controllers
 {
     [ApiController]
     [Route("api/orders")]
-    public class OrderController:ControllerBase
+    public class OrderController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
 
@@ -25,7 +25,8 @@ namespace foodOrderingApp.controllers
         }
         [Authorize]
         [HttpPost]
-        public ActionResult Create(OrderDto newOrder){
+        public ActionResult Create(OrderDto newOrder)
+        {
 
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
@@ -36,27 +37,30 @@ namespace foodOrderingApp.controllers
 
             Console.WriteLine("userid {0}", userIdClaim.Value);
 
-           if( !Guid.TryParse(userIdClaim.Value,out Guid userId)){
-            throw new AppException("Invalid Id Format",HttpStatusCode.BadRequest);
-           }
+            if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
+            {
+                throw new AppException("Invalid Id Format", HttpStatusCode.BadRequest);
+            }
 
-           if(!ModelState.IsValid){
+            if (!ModelState.IsValid)
+            {
                 return BadRequest(new { message = "Invalid Order data", errors = ModelState });
 
             }
 
-           var order =  _orderRepository.Add(newOrder,userId);
+            var order = _orderRepository.Add(newOrder, userId);
 
-           return Ok(new ApiResponse<Order>(true,order,"Order Placed Sucessfully"));
+            return Ok(new ApiResponse<Order>(true, order, "Order Placed Sucessfully"));
 
 
         }
 
         [Authorize]
-        [Authorize (Roles ="Owner")]
+        [Authorize(Roles = "Owner")]
         [HttpGet]
 
-        public ActionResult GetOrders(){
+        public ActionResult GetOrders()
+        {
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
@@ -70,24 +74,51 @@ namespace foodOrderingApp.controllers
             {
                 throw new AppException("Invalid Id Format", HttpStatusCode.BadRequest);
             }
-            var orders=_orderRepository.GetOrders(ownerId);
-            return Ok(new ApiResponse<IEnumerable<Order>>(true,orders));
+            var orders = _orderRepository.GetOrders(ownerId);
+            return Ok(new ApiResponse<IEnumerable<Order>>(true, orders));
+        }
+
+
+        [Authorize]
+        [Authorize(Roles = "Owner")]
+        [HttpGet("accepted-orders")]
+
+        public ActionResult GetAcceptedOrders()
+        {
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new ApiResponse<string>(false, "Invalid token or user ID not found."));
+            }
+
+            Console.WriteLine("userid {0}", userIdClaim.Value);
+
+            if (!Guid.TryParse(userIdClaim.Value, out Guid ownerId))
+            {
+                throw new AppException("Invalid Id Format", HttpStatusCode.BadRequest);
+            }
+            var orders = _orderRepository.GetAcceptedOrders(ownerId);
+            return Ok(new ApiResponse<IEnumerable<Order>>(true, orders));
         }
 
         [HttpPatch("{id}")]
-        public ActionResult ProcessOrder(string id){
-            if(string.IsNullOrEmpty(id)){
-                throw new AppException("No OrderId passed in params",HttpStatusCode.BadRequest);
+        public ActionResult ProcessOrder(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                throw new AppException("No OrderId passed in params", HttpStatusCode.BadRequest);
             }
 
-            if(!Guid.TryParse(id,out Guid orderId)){
+            if (!Guid.TryParse(id, out Guid orderId))
+            {
                 throw new AppException("Please provide id in Correct Format", HttpStatusCode.BadRequest);
 
             }
 
             string msg = _orderRepository.ProcessOrder(orderId);
 
-            return Ok(new ApiResponse(true ,msg));
+            return Ok(new ApiResponse(true, msg));
         }
         [HttpGet("{id}")]
         public ActionResult OrderDetails(string id)
@@ -110,7 +141,8 @@ namespace foodOrderingApp.controllers
 
 
         [HttpGet("/my-orders")]
-        public ActionResult GetMyOrders(){
+        public ActionResult GetMyOrders()
+        {
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
@@ -118,13 +150,14 @@ namespace foodOrderingApp.controllers
                 return Unauthorized(new ApiResponse<string>(false, "Login First"));
             }
 
-            if(!Guid.TryParse(userIdClaim.Value,out Guid userId)){
+            if (!Guid.TryParse(userIdClaim.Value, out Guid userId))
+            {
                 return Unauthorized(new ApiResponse<string>(false, "Invalid user Id Format."));
 
             }
             var orders = _orderRepository.MyOrders(userId);
 
-            return Ok(new ApiResponse<object>(true,orders));
+            return Ok(new ApiResponse<object>(true, orders));
         }
 
     }
