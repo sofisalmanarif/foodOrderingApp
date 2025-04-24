@@ -25,22 +25,22 @@ namespace foodOrderingApp.repositories
             }
 
             decimal totalPrice = 0;
-          
-               
-             // Validate and calculate price
-                foreach (var item in newOrder.OrderItems)
-                {
-                    var menuItem = _context.MenuItems
-                        .Include(m => m.Variants)
-                        .FirstOrDefault(m => m.Id == item.ItemId && m.RestaurantId == newOrder.RestaurantId);
 
-                    if (menuItem == null)
-                        throw new KeyNotFoundException($"MenuItem with ID {item.ItemId} not found.");
 
-                    totalPrice += (item.VariantId != null
-                                    ? menuItem.Variants?.FirstOrDefault(v => v.Id == item.VariantId)?.Price
-                                    : menuItem.Price) * item.Quantity ?? throw new KeyNotFoundException("Invalid variant or item price.");
-                }
+            // Validate and calculate price
+            foreach (var item in newOrder.OrderItems)
+            {
+                var menuItem = _context.MenuItems
+                    .Include(m => m.Variants)
+                    .FirstOrDefault(m => m.Id == item.ItemId && m.RestaurantId == newOrder.RestaurantId);
+
+                if (menuItem == null)
+                    throw new KeyNotFoundException($"MenuItem with ID {item.ItemId} not found.");
+
+                totalPrice += (item.VariantId != null
+                                ? menuItem.Variants?.FirstOrDefault(v => v.Id == item.VariantId)?.Price
+                                : menuItem.Price) * item.Quantity ?? throw new KeyNotFoundException("Invalid variant or item price.");
+            }
 
             Order order;
             if (newOrder.PaymentMethod != Order.PaymentMethod.cod && !string.IsNullOrWhiteSpace(newOrder.PaymentTransactionId))
@@ -59,8 +59,9 @@ namespace foodOrderingApp.repositories
                 };
 
             }
-            
-            else {
+
+            else
+            {
                 order = new Order()
                 {
                     UserId = userId,
@@ -71,16 +72,16 @@ namespace foodOrderingApp.repositories
 
                 };
             }
-                _context.Orders.Add(order);
-                _context.SaveChanges();
+            _context.Orders.Add(order);
+            _context.SaveChanges();
             return order;
-            
+
         }
 
         public IEnumerable<Order> GetOrders(Guid restaurantOwnerId)
         {
             return _context.Orders.Include(o => o.OrderItems)
-    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId)
+    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Pending)
     .ToList();
         }
 
@@ -103,11 +104,11 @@ namespace foodOrderingApp.repositories
             })
             .FirstOrDefault();
 
-                    if (order == null)
-                    {
-                        throw new KeyNotFoundException("No Order Found");
-                    }
-                    return order;
+            if (order == null)
+            {
+                throw new KeyNotFoundException("No Order Found");
+            }
+            return order;
         }
 
 
@@ -124,9 +125,9 @@ namespace foodOrderingApp.repositories
 
             var orders = _context.Orders
             .Where(o => o.Id == orderId)
-            .Include(o=>o.User)
+            .Include(o => o.User)
             .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.MenuItem) 
+                .ThenInclude(oi => oi.MenuItem)
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Variant)
             .Select(o => new
@@ -158,39 +159,39 @@ namespace foodOrderingApp.repositories
             })
             .FirstOrDefault();
 
-                    if (orders == null)
-                    {
-                        throw new KeyNotFoundException("No Order Found");
-                    }
-                    return orders;
-                }
-
-                public string ProcessOrder(Guid orderId)
-                {
-                    var order = _context.Orders.Find(orderId);
-                    if (order == null)
-                    {
-                        throw new KeyNotFoundException("Invalid Order Id");
-                    }
-                    if (order.Status == Order.OrderStatus.Delivered)
-                    {
-                        return "Order is Already Delivered";
-                    }
-                    if (order.Status == Order.OrderStatus.Pending)
-                    {
-                        order.Status = Order.OrderStatus.Processing;
-                    }
-                    else if (order.Status == Order.OrderStatus.Processing)
-                    {
-                        order.Status = Order.OrderStatus.Shipped;
-                    }
-                    else if (order.Status == Order.OrderStatus.Shipped)
-                    {
-                        order.Status = Order.OrderStatus.Delivered;
-                    }
-                    _context.Update(order);
-                    _context.SaveChanges();
-                    return $"Order is {order.Status.ToString()}";
-                }
+            if (orders == null)
+            {
+                throw new KeyNotFoundException("No Order Found");
             }
+            return orders;
+        }
+
+        public string ProcessOrder(Guid orderId)
+        {
+            var order = _context.Orders.Find(orderId);
+            if (order == null)
+            {
+                throw new KeyNotFoundException("Invalid Order Id");
+            }
+            if (order.Status == Order.OrderStatus.Delivered)
+            {
+                return "Order is Already Delivered";
+            }
+            if (order.Status == Order.OrderStatus.Pending)
+            {
+                order.Status = Order.OrderStatus.Processing;
+            }
+            else if (order.Status == Order.OrderStatus.Processing)
+            {
+                order.Status = Order.OrderStatus.Shipped;
+            }
+            else if (order.Status == Order.OrderStatus.Shipped)
+            {
+                order.Status = Order.OrderStatus.Delivered;
+            }
+            _context.Update(order);
+            _context.SaveChanges();
+            return $"Order is {order.Status.ToString()}";
+        }
+    }
 }
