@@ -14,10 +14,10 @@ namespace foodOrderingApp.repositories
     {
         private readonly AppDbContext _context;
         private readonly FirebaseService _fireBaseService;
-        public OrderRepository(AppDbContext context ,FirebaseService firebaseService)
+        public OrderRepository(AppDbContext context, FirebaseService firebaseService)
         {
             _context = context;
-            _fireBaseService =firebaseService;
+            _fireBaseService = firebaseService;
 
 
         }
@@ -85,7 +85,7 @@ namespace foodOrderingApp.repositories
         public IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId)
         {
             return _context.Orders.Include(o => o.OrderItems)
-    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && (o.Status == Order.OrderStatus.Shipped || o.Status ==Order.OrderStatus.Processing))
+    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && (o.Status == Order.OrderStatus.Shipped || o.Status == Order.OrderStatus.Processing))
     .ToList();
         }
 
@@ -151,7 +151,8 @@ namespace foodOrderingApp.repositories
                 {
                     MenuItemName = oi.MenuItem.Name,
                     MenuItemImage = oi.MenuItem.ImageUrl,
-                    VariantName = oi.Variant.Size
+                    VariantName = oi.Variant.Size,
+                    quantity = oi.Quantity
                 }).ToList(),
                 User = new
                 {
@@ -200,7 +201,7 @@ namespace foodOrderingApp.repositories
             {
                 order.Status = Order.OrderStatus.Delivered;
             }
-           
+            //use pushnotification
             _context.Update(order);
             _context.SaveChanges();
             return $"Order is {order.Status.ToString()}";
