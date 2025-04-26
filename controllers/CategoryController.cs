@@ -63,7 +63,7 @@ namespace foodOrderingApp.controllers
             return Ok(new ApiResponse(true, msg));
 
         }
-        [HttpGet("{id}")]
+        [HttpDelete("{id}")]
         public ActionResult Delete(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
