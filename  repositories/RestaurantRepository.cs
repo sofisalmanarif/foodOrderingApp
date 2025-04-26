@@ -17,11 +17,12 @@ namespace foodOrderingApp.reprositries
         public RestaurantRepository(AppDbContext context, IUserRepository userRepository)
         {
             _context = context;
-            _userRepository =userRepository;
+            _userRepository = userRepository;
         }
         public Restaurant Add(Restaurant restaurant)
-        {   
-            if(restaurant==null){
+        {
+            if (restaurant == null)
+            {
                 throw new ArgumentNullException(nameof(restaurant), "Restaurant cannot be null.");
             }
             _context.Restaurants.Add(restaurant);
@@ -31,16 +32,17 @@ namespace foodOrderingApp.reprositries
 
         public string Delete(Guid restaurantId)
         {
-           var restaurant =  _context.Restaurants.Find(restaurantId);
+            var restaurant = _context.Restaurants.Find(restaurantId);
 
-           if (restaurant==null){
+            if (restaurant == null)
+            {
                 throw new KeyNotFoundException("No Resturant with this id Found");
             }
             _context.Restaurants.Remove(restaurant);
             _userRepository.Delete(restaurant.OwnerId);
             _context.SaveChanges();
             return $"{restaurant.RestaurantName} Deleted Sucessfully";
-            
+
         }
 
         public IEnumerable<Restaurant> GelAllNotVerified()
@@ -50,7 +52,7 @@ namespace foodOrderingApp.reprositries
 
         public IEnumerable<Restaurant> GetAll()
         {
-            return _context.Restaurants.Where(r => r.IsVerified == true);
+            return _context.Restaurants.Where(r => r.IsVerified == true && r.IsActive == true);
         }
 
         public object? GetById(Guid id)
@@ -98,15 +100,15 @@ namespace foodOrderingApp.reprositries
 
         public string ToggleOrders(Guid ownerId)
         {
-            var restaurant = _context.Restaurants.FirstOrDefault(r=>r.OwnerId ==ownerId);
+            var restaurant = _context.Restaurants.FirstOrDefault(r => r.OwnerId == ownerId);
             if (restaurant == null)
             {
                 throw new KeyNotFoundException("No Resturant with this id Found");
             }
-            
+
             restaurant.IsActive = !restaurant.IsActive;
             _context.SaveChanges();
-            return restaurant.IsActive?" Restaurant is Accepting  Orders": " Restaurant is Not Accepting  Orders";
+            return restaurant.IsActive ? " Restaurant is Accepting  Orders" : " Restaurant is Not Accepting  Orders";
         }
 
         public string Update(Restaurant restaurant)
@@ -117,10 +119,12 @@ namespace foodOrderingApp.reprositries
         public string Verify(Guid id)
         {
             var restaurant = _context.Restaurants.Find(id);
-            if(restaurant==null){
+            if (restaurant == null)
+            {
                 throw new KeyNotFoundException("No Resturant with this id Found");
             }
-            if(restaurant.IsVerified){
+            if (restaurant.IsVerified)
+            {
                 return "Restaurnat is Already Verified";
             }
             restaurant.IsVerified = true;
