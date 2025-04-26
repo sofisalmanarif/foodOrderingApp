@@ -52,7 +52,7 @@ namespace foodOrderingApp.reprositries
 
         public IEnumerable<Restaurant> GetAll()
         {
-            return _context.Restaurants.Where(r => r.IsVerified == true && r.IsActive == true);
+            return _context.Restaurants.Where(r => r.IsVerified == true );
         }
 
         public object? GetById(Guid id)
