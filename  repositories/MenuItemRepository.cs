@@ -99,7 +99,7 @@ namespace foodOrderingApp.repositories
         public IEnumerable<object> GetAll(Guid restaurantId)
         {
             var menu = _context.MenuItems
-                .Where(item => item.RestaurantId == restaurantId)
+                .Where(item => item.RestaurantId == restaurantId )
                 .Include(item => item.Category)
                 .GroupBy(item => item.Category.Name)
                 .Select(group => new
