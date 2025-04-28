@@ -99,7 +99,7 @@ namespace foodOrderingApp.controllers
         }
 
         [Authorize]
-        [HttpPost("/save-firebase-token")]
+        [HttpPost("save-firebase-token")]
         public ActionResult SaveFirebasePushNotificationToken([FromBody] FirebaseTokenRequist firebaseTokenRequist)
         {
             Guid userId = HttpContext.User.GetUserIdFromClaims();

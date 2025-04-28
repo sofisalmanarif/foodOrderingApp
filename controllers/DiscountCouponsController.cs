@@ -41,7 +41,7 @@ namespace foodOrderingApp.controllers
         }
 
         [HttpPost]
-        [Route("/verify")]
+        [Route("verify")]
         public ActionResult VerifyCoupon([FromBody] VerifyCouponDto coupon){
             if (!ModelState.IsValid)
             {

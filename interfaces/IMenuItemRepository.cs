@@ -17,5 +17,6 @@ namespace foodOrderingApp.interfaces
         string IsAvailable(Guid id);
         string UpdateVarient(MenuItemVarient varient);
         
+        
     }
 }

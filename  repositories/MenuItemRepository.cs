@@ -129,9 +129,9 @@ namespace foodOrderingApp.repositories
             {
                 throw new KeyNotFoundException("Item not Found");
             }
-            // item.IsAvailable = !item.IsAvailable;
+            item.IsAvailable = !item.IsAvailable;
             _context.SaveChanges();
-            return $"{item.Name} ";
+            return $"{item.Name} {item.IsAvailable} ";
         }
 
         public MenuItem Update(MenuItem menuItem)
@@ -162,9 +162,10 @@ namespace foodOrderingApp.repositories
 
         public string UpdateVarient(MenuItemVarient varient)
         {
-            var existingVarient = _context.MenuItemVarients.FirstOrDefault(v=>v.Id == varient.Id);
+            var existingVarient = _context.MenuItemVarients.FirstOrDefault(v => v.Id == varient.Id);
 
-            if(existingVarient == null){
+            if (existingVarient == null)
+            {
                 throw new KeyNotFoundException("Varient not Found");
             }
             existingVarient.Id = varient.Id;

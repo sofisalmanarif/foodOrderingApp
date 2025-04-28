@@ -206,5 +206,38 @@ namespace foodOrderingApp.repositories
             _context.SaveChanges();
             return $"Order is {order.Status.ToString()}";
         }
+
+        public IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId)
+        {
+            return _context.Orders.Include(o => o.OrderItems)
+                    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Delivered)
+                    .ToList();
+        }
+
+        public object UserOrderHistory(Guid userId)
+        {
+            var order = _context.Orders
+            .Where(o => o.UserId == userId && o.Status == Order.OrderStatus.Delivered)
+            .Select(o => new
+            {
+                o.Id,
+                o.TotalPrice,
+                o.Status,
+                o.CreatedAt,
+                OrderItems = o.OrderItems.Select(oi => new
+                {
+                    MenuItemName = oi.MenuItem.Name,
+                    MenuItemImage = oi.MenuItem.ImageUrl,
+                    VariantName = oi.Variant.Size
+                }).ToList(),
+            })
+            .FirstOrDefault();
+
+            if (order == null)
+            {
+                throw new KeyNotFoundException("No Order Found");
+            }
+            return order;
+        }
     }
 }

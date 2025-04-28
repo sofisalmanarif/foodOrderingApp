@@ -13,5 +13,8 @@ namespace foodOrderingApp.interfaces
         Object OrderDetails( Guid orderId);
         Object MyOrders(Guid userId);
 
+        object UserOrderHistory(Guid userId);
+        IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId);
+
     }
 }
