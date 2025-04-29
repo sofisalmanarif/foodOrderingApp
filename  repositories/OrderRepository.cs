@@ -96,31 +96,33 @@ namespace foodOrderingApp.repositories
     .ToList();
         }
 
-        public object MyOrders(Guid userId)
+        public List<dynamic> MyOrders(Guid userId)
         {
-            var order = _context.Orders
-            .Where(o => o.UserId == userId && o.Status != Order.OrderStatus.Delivered)
-            .Select(o => new
-            {
-                o.Id,
-                o.TotalPrice,
-                o.Status,
-                o.CreatedAt,
-                OrderItems = o.OrderItems.Select(oi => new
+            var orders = _context.Orders
+                .Where(o => o.UserId == userId && o.Status != Order.OrderStatus.Delivered)
+                .Select(o => new
                 {
-                    MenuItemName = oi.MenuItem.Name,
-                    MenuItemImage = oi.MenuItem.ImageUrl,
-                    VariantName = oi.Variant.Size
-                }).ToList(),
-            })
-            .FirstOrDefault();
+                    o.Id,
+                    o.TotalPrice,
+                    o.Status,
+                    o.CreatedAt,
+                    OrderItems = o.OrderItems.Select(oi => new
+                    {
+                        MenuItemName = oi.MenuItem.Name,
+                        MenuItemImage = oi.MenuItem.ImageUrl,
+                        VariantName = oi.Variant.Size
+                    }).ToList()
+                })
+                .ToList<dynamic>();
 
-            if (order == null)
+            if (!orders.Any())
             {
-                throw new KeyNotFoundException("No Order Found");
+                throw new KeyNotFoundException("No Orders Found");
             }
-            return order;
+
+            return orders;
         }
+
 
 
         public object OrderDetails(Guid orderId)

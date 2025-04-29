@@ -11,7 +11,7 @@ namespace foodOrderingApp.interfaces
 
         string ProcessOrder(Guid orderId);
         Object OrderDetails( Guid orderId);
-        Object MyOrders(Guid userId);
+        List<dynamic> MyOrders(Guid userId);
 
         object UserOrderHistory(Guid userId);
         IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId);

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using foodOrderingApp.data;
 using foodOrderingApp.interfaces;
 using foodOrderingApp.models;
+using foodOrderingApp.services.Redis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -14,10 +15,12 @@ namespace foodOrderingApp.reprositries
     {
         private readonly AppDbContext _context;
         private readonly IUserRepository _userRepository;
-        public RestaurantRepository(AppDbContext context, IUserRepository userRepository)
+        private readonly ICacheService _casheService;
+        public RestaurantRepository(AppDbContext context, IUserRepository userRepository, ICacheService casheService)
         {
             _context = context;
             _userRepository = userRepository;
+            _casheService = casheService;
         }
         public Restaurant Add(Restaurant restaurant)
         {
@@ -47,12 +50,35 @@ namespace foodOrderingApp.reprositries
 
         public IEnumerable<Restaurant> GelAllNotVerified()
         {
-            return _context.Restaurants.Where(r => r.IsVerified == false);
+            var restaurants = _casheService.Get<IEnumerable<Restaurant>>("unverified-restaurants");
+            if (restaurants != null && restaurants.Any())
+            {
+                return restaurants;
+            }
+
+            restaurants = _context.Restaurants
+                .Where(r => !r.IsVerified)
+                .ToList();
+            TimeSpan ttl = TimeSpan.FromMinutes(30);
+            _casheService.Set("unverified-restaurants", restaurants, ttl);
+            return restaurants;
         }
 
         public IEnumerable<Restaurant> GetAll()
         {
-            return _context.Restaurants.Where(r => r.IsVerified == true );
+
+            var restaurants = _casheService.Get<IEnumerable<Restaurant>>("verified-restaurants");
+            if (restaurants != null && restaurants.Any())
+            {
+                Console.WriteLine("Got from Cahce");
+                return restaurants;
+            }
+            restaurants =  _context.Restaurants.Where(r => r.IsVerified == true ).ToList();
+            TimeSpan ttl = TimeSpan.FromMinutes(30);
+            _casheService.Set<IEnumerable<Restaurant>>("verified-restaurants", restaurants, ttl);
+            return restaurants;
+
+
         }
 
         public object? GetById(Guid id)
@@ -133,12 +159,12 @@ namespace foodOrderingApp.reprositries
         }
 
         public IEnumerable<Restaurant> GetAllRestaurantsByCategory(Guid categoryId)
-        {
-            return _context.Restaurants
-        .Include(r => r.MenuItems)
-        .Where(r => r.MenuItems != null && r.MenuItems.Any(m => m.CategoryId == categoryId))
-        .ToList();
-        }
+            {
+                return _context.Restaurants
+            .Include(r => r.MenuItems)
+            .Where(r => r.MenuItems != null && r.MenuItems.Any(m => m.CategoryId == categoryId))
+            .ToList();
+            }
 
     }
 }

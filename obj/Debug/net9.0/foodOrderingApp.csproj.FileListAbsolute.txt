@@ -160,3 +160,6 @@
 /home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Google.Apis.Core.dll
 /home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/System.Management.dll
 /home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/runtimes/win/lib/net7.0/System.Management.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Microsoft.Extensions.Caching.StackExchangeRedis.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/Pipelines.Sockets.Unofficial.dll
+/home/salman/Desktop/internship/foodOrderingApp/bin/Debug/net9.0/StackExchange.Redis.dll

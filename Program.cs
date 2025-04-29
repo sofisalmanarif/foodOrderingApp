@@ -16,6 +16,12 @@ using foodOrderingApp.services;
 using Microsoft.Extensions.FileProviders;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using foodOrderingApp.services.Redis;
+using StackExchange.Redis;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using AppRole = foodOrderingApp.models.Role;
+
 
 var builder = WebApplication.CreateBuilder(args);
 // Register the service with Dependency Injection
@@ -31,6 +37,20 @@ builder.Services.AddScoped<IDiscountCouponRepository, DiscountCouponRespository>
 
 builder.Services.AddScoped<Filters>();
 builder.Services.AddScoped<FirebaseService>();
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration["Redis:ConnectionString"];
+    options.InstanceName = "FoodAppCache:";
+});
+
+// ADD THIS 👇
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!)
+);
+
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
+builder.Services.AddLogging(configure => configure.AddConsole());
 
 
 
@@ -121,30 +141,30 @@ builder.Services.AddAuthorization(options =>
     // Scenario 2: Require Admin role
     options.AddPolicy("AdminOnly", policy =>
     {
-        policy.RequireRole(UserRepository.Roles(Role.Admin));
+        policy.RequireRole(UserRepository.Roles(AppRole.Admin));
     });
     // Scenario 3: Require User role
     options.AddPolicy("CustomerOnly", policy =>
     {
-        policy.RequireRole(UserRepository.Roles(Role.Customer));
+        policy.RequireRole(UserRepository.Roles(AppRole.Customer));
     });
 
     // Scenario 4: Require owner  role
     options.AddPolicy("OwnerOnly", policy =>
    {
-       policy.RequireRole(UserRepository.Roles(Role.Owner));
+       policy.RequireRole(UserRepository.Roles(AppRole.Owner));
    });
     // Scenario 4: Require either Admin OR User role
     // With RequireRole, listing multiple roles is an OR condition
     options.AddPolicy("AdminOrCustomers", policy =>
     {
-        policy.RequireRole(UserRepository.Roles(Role.Admin), UserRepository.Roles(Role.Customer));
+        policy.RequireRole(UserRepository.Roles(AppRole.Admin), UserRepository.Roles(AppRole.Customer));
     });
     // Scenario 5:  Authorize with Both Admin and User Roles
     // Multiple RequireRole calls within a policy are treated as AND conditions
     options.AddPolicy("AdminAndCustomers", policy =>
-        policy.RequireRole(UserRepository.Roles(Role.Admin))
-              .RequireRole(UserRepository.Roles(Role.Customer)));
+        policy.RequireRole(UserRepository.Roles(AppRole.Admin))
+              .RequireRole(UserRepository.Roles(AppRole.Customer)));
 });
 
 

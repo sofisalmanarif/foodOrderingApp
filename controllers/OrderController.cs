@@ -73,7 +73,7 @@ namespace foodOrderingApp.controllers
             return Ok(new ApiResponse<IEnumerable<Order>>(true, orders));
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Owner")]
         [HttpPatch("{id}")]
         public ActionResult ProcessOrder(string id)
         {
@@ -94,7 +94,7 @@ namespace foodOrderingApp.controllers
         }
 
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Owner")]
         [HttpGet("{id}")]
         public ActionResult OrderDetails(string id)
         {
@@ -135,7 +135,7 @@ namespace foodOrderingApp.controllers
 
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Owner")]
         [HttpGet("restaurant-order-history")]
         public ActionResult GetRestaurantsOrderHistory()
         {
