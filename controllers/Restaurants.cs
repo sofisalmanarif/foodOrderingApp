@@ -90,6 +90,7 @@ namespace foodOrderingApp.controllers
                 City=restaurantDto.City,
                 Floor =restaurantDto.Floor,
                 Landmark =restaurantDto.Landmark,
+                ShopNumber = restaurantDto.ShopNumber,
                 RefId = owner.Id,
             };
             _addressRepository.Add(restaurnatAddress);
