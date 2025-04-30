@@ -156,7 +156,7 @@ namespace foodOrderingApp.controllers
 
         
         [HttpPatch("update-varient")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles ="Owner")]
         public ActionResult UpdateVarient(MenuItemVarient varient){
             if(!ModelState.IsValid){
                 return BadRequest(new{message = "Invalid Data",errors = ModelState});
