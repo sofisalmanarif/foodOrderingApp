@@ -27,6 +27,18 @@ namespace foodOrderingApp.repositories.cart
             {
                 return "User ID is required";
             }
+            var isVAlidItemId =_context.MenuItems.FirstOrDefault(i=>i.Id==cartDto.ItemId);
+            if(isVAlidItemId==null){
+                return "Invlid item data";
+            }
+
+            if(cartDto.VariantId !=null){
+                var isDateValid = _context.MenuItemVarients.Where(mi => mi.MenuItemId == cartDto.ItemId && mi.Id == cartDto.VariantId).Any();
+                if (!isDateValid)
+                {
+                    return "Invlid varient id";
+                }
+            }
 
             var existingUserCart = _context.Carts
                 .Include(c => c.CartItems)
@@ -74,5 +86,55 @@ namespace foodOrderingApp.repositories.cart
             return "Item Added Successfully";
         }
 
+        public object GetUserCart(Guid userId)
+        {
+            return _context.CartItems
+                .Where(ci => ci.Cart.UserId == userId)
+                .Select(ci => new
+                {   Id = ci.Id,
+                    ItemId = ci.ItemId,
+                    ItemName = ci.Item.Name,
+                    ImageUrl = ci.Item.ImageUrl,
+                    Quantity = ci.Quantity,
+                    VariantId = ci.VariantId ?? null,
+                    IsAvailable = ci.Item.IsAvailable,
+                    Price = ci.VariantId != null ? (ci.Variant != null ? ci.Variant.Price : ci.Item.Price) : ci.Item.Price,
+
+                    Variant = ci.VariantId != null && ci.Variant != null ? new
+                    {
+                        VariantId = ci.Variant.Id,
+                        VariantName = ci.Variant.Size,
+                        VariantPrice = ci.Variant.Price,
+                        IsAvailable = ci.Variant.IsAvailable,
+                    } : null
+                })
+                .ToList();
+
+        }
+
+        public string RemoveItemsFromCart(Guid userId, List<Guid> itemIds)
+        {
+            // First, find the cart ID for this user
+            var cart = _context.Carts
+                .FirstOrDefault(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                return "No cart found for this user.";
+            }
+
+            var itemsToRemove = _context.CartItems
+                .Where(ci => ci.CartId == cart.Id && itemIds.Contains(ci.Id))
+                .ToList();
+
+            if (!itemsToRemove.Any())
+            {
+                return "No matching items found in the cart.";
+            }
+
+            _context.CartItems.RemoveRange(itemsToRemove);
+            _context.SaveChanges();
+            return "Items removed from the cart successfully.";
+        }
     }
 }

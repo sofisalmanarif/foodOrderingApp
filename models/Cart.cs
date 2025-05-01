@@ -26,5 +26,7 @@ namespace foodOrderingApp.models
         public Guid? VariantId { get; set; } 
         public int Quantity { get; set; } = 1;
         public Cart Cart { get; set; }
+        public MenuItemVarient? Variant { get; set; }
+        public MenuItem Item{get;set;}
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using cashfree_pg.Client;
+
 using foodOrderingApp.interfaces;
 using foodOrderingApp.middlewares;
 using foodOrderingApp.models.Dtos;
@@ -11,6 +11,8 @@ using foodOrderingApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+
+
 
 namespace foodOrderingApp.controllers.cart
 {
@@ -43,12 +45,29 @@ namespace foodOrderingApp.controllers.cart
             };
 
         string msg = _cartRepository.Add(cartDto);
-
-
-
             return  Ok(new ApiResponse(true ,msg));
 
+        }
 
+        [Authorize]
+        [HttpGet]
+        public ActionResult GetUserCart(){
+            Guid userId = HttpContext.User.GetUserIdFromClaims();
+
+            var cart = _cartRepository.GetUserCart(userId);
+            return Ok(new ApiResponse<object>(true, cart, "Cart fetched successfully"));
+
+        }
+        [Authorize]
+        [HttpDelete]
+        public ActionResult DeleteCartItems([FromBody] List<Guid> cartItemIds)
+        {
+            
+            Guid userId = HttpContext.User.GetUserIdFromClaims();
+            // var itemIds = JsonSerializer.Deserialize<List<Guid>>(cartItemIds);
+            // Console.WriteLine(JsonSerializer.Serialize<Guid>(cartItemIds));
+            var msg = _cartRepository.RemoveItemsFromCart(userId,cartItemIds);
+            return Ok(new ApiResponse(true, msg));
 
         }
 
