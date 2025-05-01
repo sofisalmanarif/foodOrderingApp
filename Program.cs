@@ -21,6 +21,7 @@ using foodOrderingApp.services.Redis;
 using StackExchange.Redis;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using AppRole = foodOrderingApp.models.Role;
+using foodOrderingApp.repositories.cart;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,13 +45,13 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "FoodAppCache:";
 });
 
-// ADD THIS 👇
 builder.Services.AddSingleton<IConnectionMultiplexer>(
     ConnectionMultiplexer.Connect(builder.Configuration["Redis:ConnectionString"]!)
 );
 
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddLogging(configure => configure.AddConsole());
+builder.Services.AddScoped<ICartRepository,CartRepository>();
 
 
 
@@ -133,7 +134,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization(options =>
 {
     // Scenario 1: Only authenticate (no specific role)
-    // This policy simply requires the user to be authenticated
     options.AddPolicy("AuthenticatedUser", policy =>
     {
         policy.RequireAuthenticatedUser();
@@ -200,7 +200,9 @@ app.UseStaticFiles(new StaticFileOptions
     ),
     RequestPath = "/uploads"
 });
-// Use CORS before other middleware
+
+
+//CORS
 app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
@@ -209,8 +211,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.Use(async (context, next) =>
 {
-    await next(); // Continue to the next middleware
-
+    await next(); 
     if (context.Response.StatusCode == (int)HttpStatusCode.NotFound)
     {
         context.Response.ContentType = "application/json";
