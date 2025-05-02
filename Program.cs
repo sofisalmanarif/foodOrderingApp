@@ -22,6 +22,7 @@ using StackExchange.Redis;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using AppRole = foodOrderingApp.models.Role;
 using foodOrderingApp.repositories.cart;
+using foodOrderingApp.repositories.dashboard;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,6 +53,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(
 builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddLogging(configure => configure.AddConsole());
 builder.Services.AddScoped<ICartRepository,CartRepository>();
+builder.Services.AddScoped<RestaurantDashboard>();
 
 
 

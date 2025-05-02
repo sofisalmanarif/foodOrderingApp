@@ -19,7 +19,7 @@ namespace foodOrderingApp.repositories
         {
             var dishes = _context.MenuItems.Include(m => m.Category)
            .Where(m => m.Name.ToLower().Contains(query) || m.Category != null && m.Category.Name.ToLower().Contains(query))
-           .Select(m => new { m.Id, m.Name, m.RestaurantId, m.ImageUrl })
+           .Select(m => new { m.Id, m.Name, m.RestaurantId, m.ImageUrl,m.Restaurant.RestaurantName,categoryName=m.Category!.Name,m.CategoryId })
            .Distinct()
            .ToList();
 
