@@ -32,6 +32,9 @@ namespace foodOrderingApp.repositories.dashboard
             {
                 throw new KeyNotFoundException("Restaurant not found");
             }
+
+            int menuItemsCount = _context.MenuItems.Where(i=>i.RestaurantId ==existingRestaurant.Id).Count();
+
             var today = DateTime.UtcNow.Date;
             var tomorrow = today.AddDays(1);
 
@@ -110,7 +113,7 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new { todaysOrderCount, todaysRevenue,hourlyStats,topItems};
+                    return new { todaysOrderCount, todaysRevenue, menuItemsCount,hourlyStats, topItems};
 
             }
 
@@ -148,7 +151,7 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new { thisWeeksOrdersCount ,thisWeeksRevenue,weeklyOrderStats,topItems};
+                    return new { thisWeeksOrdersCount ,thisWeeksRevenue, menuItemsCount, weeklyOrderStats,topItems};
 
             }
 
@@ -187,7 +190,7 @@ namespace foodOrderingApp.repositories.dashboard
                         };
                     }).ToList();
 
-                    return new {thisMonthsOrders,thisMonthsRevenue,dailyStatsOfMonth,topItems};
+                    return new {thisMonthsOrders,thisMonthsRevenue, menuItemsCount, dailyStatsOfMonth,topItems};
             }
 
             if (statsOf ==SatsOf.Year){
@@ -224,7 +227,7 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new {thisYearsOrders,thisYearsRevenue,fullMonthlyStats,topItems};
+                    return new {thisYearsOrders,thisYearsRevenue, menuItemsCount, fullMonthlyStats,topItems};
 
             }
             return new{};      
