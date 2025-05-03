@@ -9,6 +9,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace foodOrderingApp.controllers.dashboard
 {
     [ApiController]
@@ -23,9 +24,11 @@ namespace foodOrderingApp.controllers.dashboard
 
         [HttpGet("restaurant")]
         [Authorize]
-        public ActionResult RestaurantDashboard(){
+        public ActionResult RestaurantDashboard([FromQuery] foodOrderingApp.repositories.dashboard.SatsOf statsOf)
+        {
+           
             Guid ownerId = HttpContext.User.GetUserIdFromClaims();
-            var data = _restaurantDashboard.GetRestaurntDashboard(ownerId);
+            var data = _restaurantDashboard.GetRestaurntDashboard(ownerId,statsOf);
             return Ok(new ApiResponse<object>(true,data));
 
         }

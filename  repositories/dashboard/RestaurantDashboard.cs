@@ -3,22 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using cashfreepg.Api;
+using FirebaseAdmin.Messaging;
 using foodOrderingApp.data;
 using foodOrderingApp.models;
 
-namespace foodOrderingApp. repositories.dashboard
+namespace foodOrderingApp.repositories.dashboard
 {
+
+   public enum SatsOf
+    {
+        Today,
+        Week,
+        Month,
+        Year,
+    }
     public class RestaurantDashboard
     {
         private readonly AppDbContext _context;
         public RestaurantDashboard(AppDbContext context)
         {
-            _context=context;
-            
+            _context = context;
+
         }
-        public object GetRestaurntDashboard(Guid restaurantownerId){
-            Restaurant existingRestaurant = _context.Restaurants.FirstOrDefault<Restaurant>(r=>r.OwnerId == restaurantownerId)!;
-            if(existingRestaurant == null){
+        public object GetRestaurntDashboard(Guid restaurantownerId, SatsOf statsOf)
+        {
+            Restaurant existingRestaurant = _context.Restaurants.FirstOrDefault<Restaurant>(r => r.OwnerId == restaurantownerId)!;
+            if (existingRestaurant == null)
+            {
                 throw new KeyNotFoundException("Restaurant not found");
             }
             var today = DateTime.UtcNow.Date;
@@ -32,81 +43,191 @@ namespace foodOrderingApp. repositories.dashboard
 
             var startOfYear = new DateTime(today.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             var startOfNextYear = startOfYear.AddYears(1);
+            var daysInMonth = Enumerable.Range(0, (startOfNextMonth - startOfMonth).Days)
+                    .Select(offset => startOfMonth.AddDays(offset))
+                    .ToList();
+
+            var daysOfWeek = Enumerable.Range(0, 7)
+                    .Select(offset => startOfWeek.AddDays(offset))
+                    .ToList();
 
 
-            //orders
-            int todaysOrders = _context.Orders
-                .Count(o => o.RestaurantId == existingRestaurant.Id &&
-                            o.CreatedAt >= today && o.CreatedAt < tomorrow);
+            var topItems = _context.OrderItem
+                    .GroupBy(oi => oi.ItemId)
+                    .Select(g => new
+                    {
+                        ItemId = g.Key,
+                        TotalQuantity = g.Sum(oi => oi.Quantity)
+                    })
+                    .OrderByDescending(x => x.TotalQuantity)
+                    .Take(5)
+                    .Join(_context.MenuItems,
+                        oi => oi.ItemId,
+                        mi => mi.Id,
+                        (oi, mi) => new
+                        {
+                            mi.Id,
+                            mi.Name,
+                            mi.ImageUrl,
+                            // mi.Variants,
+                            oi.TotalQuantity
+                        })
+                    .ToList();
 
-            int thisWeeksOrders = _context.Orders
+            if (statsOf ==SatsOf.Today){
+                int todaysOrderCount = _context.Orders
+               .Count(o => o.RestaurantId == existingRestaurant.Id &&
+                           o.CreatedAt >= today && o.CreatedAt < tomorrow);
+
+                decimal todaysRevenue = _context.Orders
+                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                                o.CreatedAt >= today && o.CreatedAt < tomorrow)
+                    .Sum(o => o.TotalPrice);
+
+                // Query actual order data grouped by hour
+                var rawHourlyStats = _context.Orders
+                    .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
+                    .GroupBy(o => o.CreatedAt.Hour)
+                    .Select(g => new
+                    {
+                        Hour = g.Key,
+                        OrderCount = g.Count(),
+                        TotalRevenue = g.Sum(o => o.TotalPrice)
+                    })
+                    .ToList();
+
+                // Ensure all 24 hours are included
+                var hourlyStats = Enumerable.Range(0, 24)
+                    .Select(hour =>
+                    {
+                        var stat = rawHourlyStats.FirstOrDefault(s => s.Hour == hour);
+                        return new
+                        {
+                            Hour = hour,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    })
+                    .ToList();
+
+                    return new { todaysOrderCount, todaysRevenue,hourlyStats,topItems};
+
+            }
+
+            if(statsOf==SatsOf.Week){
+                int thisWeeksOrdersCount = _context.Orders
                 .Count(o => o.RestaurantId == existingRestaurant.Id &&
                             o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek);
 
-            int thisMonthsOrders = _context.Orders
+                decimal thisWeeksRevenue = _context.Orders
+                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                            o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek)
+                    .Sum(o => o.TotalPrice);
+
+                var rawStats = _context.Orders
+                    .Where(o => o.CreatedAt >= startOfWeek && o.CreatedAt < startOfWeek.AddDays(7))
+                    .GroupBy(o => o.CreatedAt.Date)
+                    .Select(g => new
+                    {
+                        Date = g.Key,
+                        OrderCount = g.Count(),
+                        TotalRevenue = g.Sum(o => o.TotalPrice)
+                    })
+                    .ToList();
+
+                var weeklyOrderStats = daysOfWeek
+                    .Select(day =>
+                    {
+                        var stat = rawStats.FirstOrDefault(s => s.Date == day);
+                        return new
+                        {
+                            Date = day,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    })
+                    .ToList();
+
+                    return new { thisWeeksOrdersCount ,thisWeeksRevenue,weeklyOrderStats,topItems};
+
+            }
+
+            if(statsOf  ==SatsOf.Month){
+                int thisMonthsOrders = _context.Orders
                 .Count(o => o.RestaurantId == existingRestaurant.Id &&
                             o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth);
 
-            int thisYearsOrders = _context.Orders
-                .Count(o => o.RestaurantId == existingRestaurant.Id &&
-                            o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear);
+                decimal thisMonthsRevenue = _context.Orders
+                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                            o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
+                    .Sum(o => o.TotalPrice);
 
-
-
-            //Revenue
-            decimal todaysRevenue = _context.Orders
-            .Where(o => o.RestaurantId == existingRestaurant.Id &&
-                        o.CreatedAt >= today && o.CreatedAt < tomorrow)
-            .Sum(o => o.TotalPrice);
-
-            decimal thisWeeksRevenue = _context.Orders
-            .Where(o => o.RestaurantId == existingRestaurant.Id &&
-                        o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek)
-            .Sum(o => o.TotalPrice);
-
-            decimal thisMonthsRevenue = _context.Orders
-           .Where(o => o.RestaurantId == existingRestaurant.Id &&
-                       o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
-           .Sum(o => o.TotalPrice);
-
-            decimal thisYearsRevenue = _context.Orders
-            .Where(o => o.RestaurantId == existingRestaurant.Id &&
-                        o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextWeek)
-            .Sum(o => o.TotalPrice);
-
-            var topItems = _context.OrderItem
-                .GroupBy(oi => oi.ItemId)
-                .Select(g => new
-                {
-                    ItemId = g.Key,
-                    TotalQuantity = g.Sum(oi => oi.Quantity)
-                })
-                .OrderByDescending(x => x.TotalQuantity)
-                .Take(5)
-                .Join(_context.MenuItems,
-                    oi => oi.ItemId,
-                    mi => mi.Id,
-                    (oi, mi) => new
+                //30 days per day order count and revenur
+                var dailyorderStats = _context.Orders
+                    .Where(o => o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
+                    .GroupBy(o => o.CreatedAt.Date)
+                    .Select(g => new
                     {
-                        mi.Id,
-                        mi.Name,
-                        mi.ImageUrl,
-                        // mi.Variants,
-                        oi.TotalQuantity
+                        Date = g.Key,
+                        OrderCount = g.Count(),
+                        TotalRevenue = g.Sum(o => o.TotalPrice)
                     })
-                .ToList();
+                    .ToList();
 
 
+                // Join with all days to ensure missing days have 0
+                var dailyStatsOfMonth = daysInMonth.Select(date =>
+                    {
+                        var stat = dailyorderStats.FirstOrDefault(s => s.Date == date);
+                        return new
+                        {
+                            Date = date,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    }).ToList();
 
-            var stats = new[]
-                            {
-                                new { Label = "Today", Orders = todaysOrders, Revenue = todaysRevenue },
-                                new { Label = "This Week", Orders = thisWeeksOrders, Revenue = thisWeeksRevenue },
-                                new { Label = "This Month", Orders = thisMonthsOrders, Revenue = thisMonthsRevenue },
-                                new { Label = "This Year", Orders = thisYearsOrders, Revenue = thisYearsRevenue }
-                            };
-            return new{stats, topItems };
+                    return new {thisMonthsOrders,thisMonthsRevenue,dailyStatsOfMonth,topItems};
+            }
 
+            if (statsOf ==SatsOf.Year){
+
+                int thisYearsOrders = _context.Orders
+                    .Count(o => o.RestaurantId == existingRestaurant.Id &&
+                                o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear);
+                decimal thisYearsRevenue = _context.Orders
+                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                        o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextWeek)
+                    .Sum(o => o.TotalPrice);
+
+                var rawMonthlyStats = _context.Orders
+                    .Where(o => o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear)
+                    .GroupBy(o => o.CreatedAt.Month)
+                    .Select(g => new
+                    {
+                        Month = g.Key,
+                        OrderCount = g.Count(),
+                        TotalRevenue = g.Sum(o => o.TotalPrice)
+                    })
+                    .ToList();
+
+                var fullMonthlyStats = Enumerable.Range(1, 12)
+                    .Select(month =>
+                    {
+                        var stat = rawMonthlyStats.FirstOrDefault(x => x.Month == month);
+                        return new
+                        {
+                            Month = month,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    })
+                    .ToList();
+
+                    return new {thisYearsOrders,thisYearsRevenue,fullMonthlyStats,topItems};
+
+            }
+            return new{};      
 
         }
     }
