@@ -72,17 +72,17 @@ namespace foodOrderingApp.repositories.dashboard
                             mi.Id,
                             mi.Name,
                             mi.ImageUrl,
-                            // mi.Variants,
-                            oi.TotalQuantity
+                            category_name =mi!.Category!.Name!,
+                            total_orders =oi.TotalQuantity
                         })
                     .ToList();
 
             if (statsOf ==SatsOf.Today){
-                int todaysOrderCount = _context.Orders
+                int ordersCount = _context.Orders
                .Count(o => o.RestaurantId == existingRestaurant.Id &&
                            o.CreatedAt >= today && o.CreatedAt < tomorrow);
 
-                decimal todaysRevenue = _context.Orders
+                decimal revenue = _context.Orders
                     .Where(o => o.RestaurantId == existingRestaurant.Id &&
                                 o.CreatedAt >= today && o.CreatedAt < tomorrow)
                     .Sum(o => o.TotalPrice);
@@ -100,7 +100,7 @@ namespace foodOrderingApp.repositories.dashboard
                     .ToList();
 
                 // Ensure all 24 hours are included
-                var hourlyStats = Enumerable.Range(0, 24)
+                var chartData = Enumerable.Range(0, 24)
                     .Select(hour =>
                     {
                         var stat = rawHourlyStats.FirstOrDefault(s => s.Hour == hour);
@@ -113,16 +113,16 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new { todaysOrderCount, todaysRevenue, menuItemsCount,hourlyStats, topItems};
+                    return new { ordersCount, revenue, menuItemsCount, chartData, topItems};
 
             }
 
             if(statsOf==SatsOf.Week){
-                int thisWeeksOrdersCount = _context.Orders
+                int ordersCount = _context.Orders
                 .Count(o => o.RestaurantId == existingRestaurant.Id &&
                             o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek);
 
-                decimal thisWeeksRevenue = _context.Orders
+                decimal revenue = _context.Orders
                     .Where(o => o.RestaurantId == existingRestaurant.Id &&
                             o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek)
                     .Sum(o => o.TotalPrice);
@@ -138,7 +138,7 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                var weeklyOrderStats = daysOfWeek
+                var chartData = daysOfWeek
                     .Select(day =>
                     {
                         var stat = rawStats.FirstOrDefault(s => s.Date == day);
@@ -151,16 +151,16 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new { thisWeeksOrdersCount ,thisWeeksRevenue, menuItemsCount, weeklyOrderStats,topItems};
+                return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
 
             }
 
             if(statsOf  ==SatsOf.Month){
-                int thisMonthsOrders = _context.Orders
+                int ordersCount = _context.Orders
                 .Count(o => o.RestaurantId == existingRestaurant.Id &&
                             o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth);
 
-                decimal thisMonthsRevenue = _context.Orders
+                decimal revenue = _context.Orders
                     .Where(o => o.RestaurantId == existingRestaurant.Id &&
                             o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
                     .Sum(o => o.TotalPrice);
@@ -179,7 +179,7 @@ namespace foodOrderingApp.repositories.dashboard
 
 
                 // Join with all days to ensure missing days have 0
-                var dailyStatsOfMonth = daysInMonth.Select(date =>
+                var chartData = daysInMonth.Select(date =>
                     {
                         var stat = dailyorderStats.FirstOrDefault(s => s.Date == date);
                         return new
@@ -190,15 +190,16 @@ namespace foodOrderingApp.repositories.dashboard
                         };
                     }).ToList();
 
-                    return new {thisMonthsOrders,thisMonthsRevenue, menuItemsCount, dailyStatsOfMonth,topItems};
+                return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
+
             }
 
             if (statsOf ==SatsOf.Year){
 
-                int thisYearsOrders = _context.Orders
+                int ordersCount = _context.Orders
                     .Count(o => o.RestaurantId == existingRestaurant.Id &&
                                 o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear);
-                decimal thisYearsRevenue = _context.Orders
+                decimal revenue = _context.Orders
                     .Where(o => o.RestaurantId == existingRestaurant.Id &&
                         o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextWeek)
                     .Sum(o => o.TotalPrice);
@@ -214,7 +215,7 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                var fullMonthlyStats = Enumerable.Range(1, 12)
+                var chartData = Enumerable.Range(1, 12)
                     .Select(month =>
                     {
                         var stat = rawMonthlyStats.FirstOrDefault(x => x.Month == month);
@@ -227,7 +228,7 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new {thisYearsOrders,thisYearsRevenue, menuItemsCount, fullMonthlyStats,topItems};
+                return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
 
             }
             return new{};      
