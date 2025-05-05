@@ -55,27 +55,8 @@ namespace foodOrderingApp.repositories.dashboard
                     .ToList();
 
 
-            var topItems = _context.OrderItem.Where(o=>o.Order.RestaurantId ==existingRestaurant.Id)
-                    .GroupBy(oi => oi.ItemId)
-                    .Select(g => new
-                    {
-                        ItemId = g.Key,
-                        TotalQuantity = g.Sum(oi => oi.Quantity)
-                    })
-                    .OrderByDescending(x => x.TotalQuantity)
-                    .Take(5)
-                    .Join(_context.MenuItems,
-                        oi => oi.ItemId,
-                        mi => mi.Id,
-                        (oi, mi) => new
-                        {
-                            mi.Id,
-                            mi.Name,
-                            mi.ImageUrl,
-                            category_name =mi!.Category!.Name!,
-                            total_orders =oi.TotalQuantity
-                        })
-                    .ToList();
+            
+                 
 
             if (statsOf ==SatsOf.Today){
                 int ordersCount = _context.Orders
@@ -89,15 +70,15 @@ namespace foodOrderingApp.repositories.dashboard
 
 
                 var rawHourlyStats = _context.Orders
-    .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
-    .GroupBy(o => o.CreatedAt.Hour)
-    .Select(g => new
-    {
-        Hour = g.Key,
-        OrderCount = g.Count(),
-        TotalRevenue = g.Sum(o => o.TotalPrice)
-    })
-    .ToList();
+                    .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
+                    .GroupBy(o => o.CreatedAt.Hour)
+                    .Select(g => new
+                    {
+                        Hour = g.Key,
+                        OrderCount = g.Count(),
+                        TotalRevenue = g.Sum(o => o.TotalPrice)
+                    })
+                    .ToList();
 
                 // Ensure all 24 hours are included and transform to chart-ready arrays
                 var totalChartData = Enumerable.Range(0, 24)
@@ -124,6 +105,27 @@ namespace foodOrderingApp.repositories.dashboard
                     orders,
                     revenues
                 };
+                var topItems = _context.OrderItem.Where(o => o.Order.RestaurantId == existingRestaurant.Id &&
+                            o.Order.CreatedAt >= today && o.Order.CreatedAt < tomorrow).GroupBy(oi => oi.ItemId)
+                    .Select(g => new
+                    {
+                        ItemId = g.Key,
+                        TotalQuantity = g.Sum(oi => oi.Quantity)
+                    })
+                    .OrderByDescending(x => x.TotalQuantity)
+                    .Take(5)
+                    .Join(_context.MenuItems,
+                        oi => oi.ItemId,
+                        mi => mi.Id,
+                        (oi, mi) => new
+                        {
+                            mi.Id,
+                            mi.Name,
+                            mi.ImageUrl,
+                            category_name = mi!.Category!.Name!,
+                            total_orders = oi.TotalQuantity
+                        })
+                    .ToList(); 
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems};
 
@@ -151,17 +153,17 @@ namespace foodOrderingApp.repositories.dashboard
                     .ToList();
 
                 var totalChartData = daysOfWeek
-     .Select(day =>
-     {
-         var stat = rawStats.FirstOrDefault(s => s.Date == day);
-         return new
-         {
-             Date = day,
-             OrderCount = stat?.OrderCount ?? 0,
-             TotalRevenue = stat?.TotalRevenue ?? 0
-         };
-     })
-     .ToList();
+                    .Select(day =>
+                    {
+                        var stat = rawStats.FirstOrDefault(s => s.Date == day);
+                        return new
+                        {
+                            Date = day,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    })
+                    .ToList();
 
                 // Final transformation
                 var labels = totalChartData.Select(x => x.Date.ToString("ddd")).ToList(); // or "yyyy-MM-dd" for full date
@@ -174,6 +176,29 @@ namespace foodOrderingApp.repositories.dashboard
                     orders,
                     revenues
                 };
+
+
+                var topItems = _context.OrderItem.Where(o => o.Order.RestaurantId == existingRestaurant.Id &&
+                            o.Order.CreatedAt >= startOfWeek && o.Order.CreatedAt < startOfNextWeek).GroupBy(oi => oi.ItemId)
+                    .Select(g => new
+                    {
+                        ItemId = g.Key,
+                        TotalQuantity = g.Sum(oi => oi.Quantity)
+                    })
+                    .OrderByDescending(x => x.TotalQuantity)
+                    .Take(5)
+                    .Join(_context.MenuItems,
+                        oi => oi.ItemId,
+                        mi => mi.Id,
+                        (oi, mi) => new
+                        {
+                            mi.Id,
+                            mi.Name,
+                            mi.ImageUrl,
+                            category_name = mi!.Category!.Name!,
+                            total_orders = oi.TotalQuantity
+                        })
+                    .ToList(); 
 
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
@@ -205,15 +230,15 @@ namespace foodOrderingApp.repositories.dashboard
 
                 //missing days wil have 0 
                 var totalChartData = daysInMonth.Select(date =>
-    {
-        var stat = dailyorderStats.FirstOrDefault(s => s.Date == date);
-        return new
-        {
-            Date = date,
-            OrderCount = stat?.OrderCount ?? 0,
-            TotalRevenue = stat?.TotalRevenue ?? 0
-        };
-    }).ToList();
+                    {
+                        var stat = dailyorderStats.FirstOrDefault(s => s.Date == date);
+                        return new
+                        {
+                            Date = date,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    }).ToList();
 
                 // Final transformation
                 var labels = totalChartData.Select(x => x.Date.ToString("dd")).ToList(); // or "dd MMM" for formatted date
@@ -226,6 +251,28 @@ namespace foodOrderingApp.repositories.dashboard
                     orders,
                     revenues
                 };
+
+                var topItems = _context.OrderItem.Where(o => o.Order.RestaurantId == existingRestaurant.Id &&
+                            o.Order.CreatedAt >= startOfMonth && o.Order.CreatedAt < startOfNextMonth).GroupBy(oi => oi.ItemId)
+                    .Select(g => new
+                    {
+                        ItemId = g.Key,
+                        TotalQuantity = g.Sum(oi => oi.Quantity)
+                    })
+                    .OrderByDescending(x => x.TotalQuantity)
+                    .Take(5)
+                    .Join(_context.MenuItems,
+                        oi => oi.ItemId,
+                        mi => mi.Id,
+                        (oi, mi) => new
+                        {
+                            mi.Id,
+                            mi.Name,
+                            mi.ImageUrl,
+                            category_name = mi!.Category!.Name!,
+                            total_orders = oi.TotalQuantity
+                        })
+                    .ToList();
 
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
@@ -254,17 +301,17 @@ namespace foodOrderingApp.repositories.dashboard
                     .ToList();
 
                 var totalChartData = Enumerable.Range(1, 12)
-     .Select(month =>
-     {
-         var stat = rawMonthlyStats.FirstOrDefault(x => x.Month == month);
-         return new
-         {
-             Month = month,
-             OrderCount = stat?.OrderCount ?? 0,
-             TotalRevenue = stat?.TotalRevenue ?? 0
-         };
-     })
-     .ToList();
+                    .Select(month =>
+                    {
+                        var stat = rawMonthlyStats.FirstOrDefault(x => x.Month == month);
+                        return new
+                        {
+                            Month = month,
+                            OrderCount = stat?.OrderCount ?? 0,
+                            TotalRevenue = stat?.TotalRevenue ?? 0
+                        };
+                    })
+                    .ToList();
 
                 // Final transformation
                 var labels = totalChartData.Select(x => new DateTime(1, x.Month, 1).ToString("MMM")).ToList(); // Jan, Feb, etc.
@@ -277,6 +324,27 @@ namespace foodOrderingApp.repositories.dashboard
                     orders,
                     revenues
                 };
+                var topItems = _context.OrderItem.Where(o => o.Order.RestaurantId == existingRestaurant.Id &&
+                            o.Order.CreatedAt >= startOfYear && o.Order.CreatedAt < startOfNextYear).GroupBy(oi => oi.ItemId)
+                    .Select(g => new
+                    {
+                        ItemId = g.Key,
+                        TotalQuantity = g.Sum(oi => oi.Quantity)
+                    })
+                    .OrderByDescending(x => x.TotalQuantity)
+                    .Take(5)
+                    .Join(_context.MenuItems,
+                        oi => oi.ItemId,
+                        mi => mi.Id,
+                        (oi, mi) => new
+                        {
+                            mi.Id,
+                            mi.Name,
+                            mi.ImageUrl,
+                            category_name = mi!.Category!.Name!,
+                            total_orders = oi.TotalQuantity
+                        })
+                    .ToList();
 
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
