@@ -55,7 +55,7 @@ namespace foodOrderingApp.repositories.dashboard
                     .ToList();
 
 
-            var topItems = _context.OrderItem
+            var topItems = _context.OrderItem.Where(o=>o.Order.RestaurantId ==existingRestaurant.Id)
                     .GroupBy(oi => oi.ItemId)
                     .Select(g => new
                     {
@@ -87,20 +87,20 @@ namespace foodOrderingApp.repositories.dashboard
                                 o.CreatedAt >= today && o.CreatedAt < tomorrow)
                     .Sum(o => o.TotalPrice);
 
-                // Query actual order data grouped by hour
-                var rawHourlyStats = _context.Orders
-                    .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
-                    .GroupBy(o => o.CreatedAt.Hour)
-                    .Select(g => new
-                    {
-                        Hour = g.Key,
-                        OrderCount = g.Count(),
-                        TotalRevenue = g.Sum(o => o.TotalPrice)
-                    })
-                    .ToList();
 
-                // Ensure all 24 hours are included
-                var chartData = Enumerable.Range(0, 24)
+                var rawHourlyStats = _context.Orders
+    .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
+    .GroupBy(o => o.CreatedAt.Hour)
+    .Select(g => new
+    {
+        Hour = g.Key,
+        OrderCount = g.Count(),
+        TotalRevenue = g.Sum(o => o.TotalPrice)
+    })
+    .ToList();
+
+                // Ensure all 24 hours are included and transform to chart-ready arrays
+                var totalChartData = Enumerable.Range(0, 24)
                     .Select(hour =>
                     {
                         var stat = rawHourlyStats.FirstOrDefault(s => s.Hour == hour);
@@ -113,7 +113,19 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                    return new { ordersCount, revenue, menuItemsCount, chartData, topItems};
+                // Final transformation
+                var labels = totalChartData.Select(x => x.Hour.ToString("D2") + ":00").ToList();
+                var orders = totalChartData.Select(x => x.OrderCount).ToList();
+                var revenues = totalChartData.Select(x => x.TotalRevenue).ToList();
+
+                var chartData = new
+                {
+                    labels,
+                    orders,
+                    revenues
+                };
+
+                return new { ordersCount, revenue, menuItemsCount, chartData, topItems};
 
             }
 
@@ -138,18 +150,31 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                var chartData = daysOfWeek
-                    .Select(day =>
-                    {
-                        var stat = rawStats.FirstOrDefault(s => s.Date == day);
-                        return new
-                        {
-                            Date = day,
-                            OrderCount = stat?.OrderCount ?? 0,
-                            TotalRevenue = stat?.TotalRevenue ?? 0
-                        };
-                    })
-                    .ToList();
+                var totalChartData = daysOfWeek
+     .Select(day =>
+     {
+         var stat = rawStats.FirstOrDefault(s => s.Date == day);
+         return new
+         {
+             Date = day,
+             OrderCount = stat?.OrderCount ?? 0,
+             TotalRevenue = stat?.TotalRevenue ?? 0
+         };
+     })
+     .ToList();
+
+                // Final transformation
+                var labels = totalChartData.Select(x => x.Date.ToString("ddd")).ToList(); // or "yyyy-MM-dd" for full date
+                var orders = totalChartData.Select(x => x.OrderCount).ToList();
+                var revenues = totalChartData.Select(x => x.TotalRevenue).ToList();
+
+                var chartData = new
+                {
+                    labels,
+                    orders,
+                    revenues
+                };
+
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
 
@@ -178,17 +203,30 @@ namespace foodOrderingApp.repositories.dashboard
                     .ToList();
 
 
-                // Join with all days to ensure missing days have 0
-                var chartData = daysInMonth.Select(date =>
-                    {
-                        var stat = dailyorderStats.FirstOrDefault(s => s.Date == date);
-                        return new
-                        {
-                            Date = date,
-                            OrderCount = stat?.OrderCount ?? 0,
-                            TotalRevenue = stat?.TotalRevenue ?? 0
-                        };
-                    }).ToList();
+                //missing days wil have 0 
+                var totalChartData = daysInMonth.Select(date =>
+    {
+        var stat = dailyorderStats.FirstOrDefault(s => s.Date == date);
+        return new
+        {
+            Date = date,
+            OrderCount = stat?.OrderCount ?? 0,
+            TotalRevenue = stat?.TotalRevenue ?? 0
+        };
+    }).ToList();
+
+                // Final transformation
+                var labels = totalChartData.Select(x => x.Date.ToString("dd")).ToList(); // or "dd MMM" for formatted date
+                var orders = totalChartData.Select(x => x.OrderCount).ToList();
+                var revenues = totalChartData.Select(x => x.TotalRevenue).ToList();
+
+                var chartData = new
+                {
+                    labels,
+                    orders,
+                    revenues
+                };
+
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
 
@@ -215,18 +253,31 @@ namespace foodOrderingApp.repositories.dashboard
                     })
                     .ToList();
 
-                var chartData = Enumerable.Range(1, 12)
-                    .Select(month =>
-                    {
-                        var stat = rawMonthlyStats.FirstOrDefault(x => x.Month == month);
-                        return new
-                        {
-                            Month = month,
-                            OrderCount = stat?.OrderCount ?? 0,
-                            TotalRevenue = stat?.TotalRevenue ?? 0
-                        };
-                    })
-                    .ToList();
+                var totalChartData = Enumerable.Range(1, 12)
+     .Select(month =>
+     {
+         var stat = rawMonthlyStats.FirstOrDefault(x => x.Month == month);
+         return new
+         {
+             Month = month,
+             OrderCount = stat?.OrderCount ?? 0,
+             TotalRevenue = stat?.TotalRevenue ?? 0
+         };
+     })
+     .ToList();
+
+                // Final transformation
+                var labels = totalChartData.Select(x => new DateTime(1, x.Month, 1).ToString("MMM")).ToList(); // Jan, Feb, etc.
+                var orders = totalChartData.Select(x => x.OrderCount).ToList();
+                var revenues = totalChartData.Select(x => x.TotalRevenue).ToList();
+
+                var chartData = new
+                {
+                    labels,
+                    orders,
+                    revenues
+                };
+
 
                 return new { ordersCount, revenue, menuItemsCount, chartData, topItems };
 
