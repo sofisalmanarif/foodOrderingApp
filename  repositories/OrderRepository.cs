@@ -77,8 +77,11 @@ namespace foodOrderingApp.repositories
                 };
             }
             _context.Orders.Add(order);
+            var restaurant = _context.Restaurants.FirstOrDefault(r => r.Id == newOrder.RestaurantId);
+            if (restaurant == null)
+                throw new KeyNotFoundException("Restaurant not found.");
             //use pushnotification
-            var res = _context.FirebaseTokens.FirstOrDefault(f => f.UserId == order.Restaurant.OwnerId);
+            var res = _context.FirebaseTokens.FirstOrDefault(f => f.UserId == restaurant.OwnerId);
             if (res != null)
             {
                 await _fireBaseService.SendPushNotification(res.FirebaseToken, "New Order ", $"Your have a new order {order.Id}");

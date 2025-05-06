@@ -130,7 +130,7 @@ namespace foodOrderingApp. repositories.dashboard
 
                     var rawStats = _context.Orders
                         .Where(o => o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
-                         o.CreatedAt >= startOfWeek && o.CreatedAt < startOfWeek.AddDays(7))
+                         o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek)
                         .GroupBy(o => o.CreatedAt.Date)
                         .Select(g => new
                         {

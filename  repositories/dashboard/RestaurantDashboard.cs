@@ -142,7 +142,7 @@ namespace foodOrderingApp.repositories.dashboard
                     .Sum(o => o.TotalPrice);
 
                 var rawStats = _context.Orders
-                    .Where(o => o.RestaurantId ==existingRestaurant.Id &&o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled && o.CreatedAt >= startOfWeek && o.CreatedAt < startOfWeek.AddDays(7))
+                    .Where(o => o.RestaurantId ==existingRestaurant.Id &&o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled && o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek)
                     .GroupBy(o => o.CreatedAt.Date)
                     .Select(g => new
                     {
@@ -207,17 +207,17 @@ namespace foodOrderingApp.repositories.dashboard
 
             if(statsOf  ==SatsOf.Month){
                 int ordersCount = _context.Orders
-                .Count(o => o.RestaurantId == existingRestaurant.Id &&
+                .Count(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                             o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth);
 
                 decimal revenue = _context.Orders
-                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                    .Where(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                             o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
                     .Sum(o => o.TotalPrice);
 
                 //30 days per day order count and revenur
                 var dailyorderStats = _context.Orders
-                    .Where(o => o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
+                    .Where(o => o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled && o.CreatedAt >= startOfMonth && o.CreatedAt < startOfNextMonth)
                     .GroupBy(o => o.CreatedAt.Date)
                     .Select(g => new
                     {
@@ -286,7 +286,7 @@ namespace foodOrderingApp.repositories.dashboard
                                 o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear);
                 decimal revenue = _context.Orders
                     .Where(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
-                        o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextWeek)
+                        o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear)
                     .Sum(o => o.TotalPrice);
 
                 var rawMonthlyStats = _context.Orders
