@@ -17,19 +17,32 @@ namespace foodOrderingApp.controllers.dashboard
     public class Dashboard:ControllerBase
     {
         private readonly RestaurantDashboard _restaurantDashboard;
-        public Dashboard(RestaurantDashboard restaurantDashboard)
+        private readonly AdminDashboard _adminDashboard;
+        public Dashboard(RestaurantDashboard restaurantDashboard ,AdminDashboard adminDashboard)
         {
              _restaurantDashboard =  restaurantDashboard;
+             _adminDashboard =adminDashboard;
         }
 
         [HttpGet("restaurant")]
-        [Authorize]
+        [Authorize(Roles ="Owner")]
         public ActionResult RestaurantDashboard([FromQuery] foodOrderingApp.repositories.dashboard.SatsOf statsOf)
         {
            
             Guid ownerId = HttpContext.User.GetUserIdFromClaims();
             var data = _restaurantDashboard.GetRestaurntDashboard(ownerId,statsOf);
             return Ok(new ApiResponse<object>(true,data));
+
+        }
+
+        [HttpGet("admin")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult AdminDashboard([FromQuery] foodOrderingApp.repositories.dashboard.SatsOf statsOf)
+        {
+
+            Guid adminId = HttpContext.User.GetUserIdFromClaims();
+            var data = _adminDashboard.GetAdminDashboard(statsOf);
+            return Ok(new ApiResponse<object>(true, data));
 
         }
 

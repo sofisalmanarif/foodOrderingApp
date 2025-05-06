@@ -60,17 +60,17 @@ namespace foodOrderingApp.repositories.dashboard
 
             if (statsOf ==SatsOf.Today){
                 int ordersCount = _context.Orders
-               .Count(o => o.RestaurantId == existingRestaurant.Id &&
+               .Count(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                            o.CreatedAt >= today && o.CreatedAt < tomorrow);
 
                 decimal revenue = _context.Orders
-                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                    .Where(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                                 o.CreatedAt >= today && o.CreatedAt < tomorrow)
                     .Sum(o => o.TotalPrice);
 
 
                 var rawHourlyStats = _context.Orders
-                    .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
+                    .Where(o =>o.RestaurantId ==existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled && o.CreatedAt >= today && o.CreatedAt < tomorrow)
                     .GroupBy(o => o.CreatedAt.Hour)
                     .Select(g => new
                     {
@@ -133,16 +133,16 @@ namespace foodOrderingApp.repositories.dashboard
 
             if(statsOf==SatsOf.Week){
                 int ordersCount = _context.Orders
-                .Count(o => o.RestaurantId == existingRestaurant.Id &&
+                .Count(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                             o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek);
 
                 decimal revenue = _context.Orders
-                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                    .Where(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                             o.CreatedAt >= startOfWeek && o.CreatedAt < startOfNextWeek)
                     .Sum(o => o.TotalPrice);
 
                 var rawStats = _context.Orders
-                    .Where(o => o.CreatedAt >= startOfWeek && o.CreatedAt < startOfWeek.AddDays(7))
+                    .Where(o => o.RestaurantId ==existingRestaurant.Id &&o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled && o.CreatedAt >= startOfWeek && o.CreatedAt < startOfWeek.AddDays(7))
                     .GroupBy(o => o.CreatedAt.Date)
                     .Select(g => new
                     {
@@ -282,15 +282,15 @@ namespace foodOrderingApp.repositories.dashboard
             if (statsOf ==SatsOf.Year){
 
                 int ordersCount = _context.Orders
-                    .Count(o => o.RestaurantId == existingRestaurant.Id &&
+                    .Count(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                                 o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear);
                 decimal revenue = _context.Orders
-                    .Where(o => o.RestaurantId == existingRestaurant.Id &&
+                    .Where(o => o.RestaurantId == existingRestaurant.Id && o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled &&
                         o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextWeek)
                     .Sum(o => o.TotalPrice);
 
                 var rawMonthlyStats = _context.Orders
-                    .Where(o => o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear)
+                    .Where(o =>o.RestaurantId ==existingRestaurant.Id&& o.Status != Order.OrderStatus.Pending && o.Status != Order.OrderStatus.Cancelled && o.CreatedAt >= startOfYear && o.CreatedAt < startOfNextYear)
                     .GroupBy(o => o.CreatedAt.Month)
                     .Select(g => new
                     {

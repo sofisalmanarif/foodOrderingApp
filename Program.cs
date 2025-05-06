@@ -54,6 +54,7 @@ builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddLogging(configure => configure.AddConsole());
 builder.Services.AddScoped<ICartRepository,CartRepository>();
 builder.Services.AddScoped<RestaurantDashboard>();
+builder.Services.AddScoped<AdminDashboard>();
 
 
 
