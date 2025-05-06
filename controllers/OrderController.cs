@@ -26,7 +26,7 @@ namespace foodOrderingApp.controllers
         }
         [Authorize]
         [HttpPost]
-        public ActionResult Create(OrderDto newOrder)
+        public async Task<ActionResult> Create(OrderDto newOrder)
         {
 
             Guid userId = HttpContext.User.GetUserIdFromClaims();
@@ -38,7 +38,7 @@ namespace foodOrderingApp.controllers
 
             }
 
-            var order = _orderRepository.Add(newOrder, userId);
+            var order = await _orderRepository.Add(newOrder, userId);
 
             return Ok(new ApiResponse<Order>(true, order, "Order Placed Sucessfully"));
 
@@ -75,7 +75,7 @@ namespace foodOrderingApp.controllers
 
         [Authorize(Roles ="Owner")]
         [HttpPatch("{id}")]
-        public ActionResult ProcessOrder(string id)
+        public async Task<ActionResult> ProcessOrder(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -88,7 +88,7 @@ namespace foodOrderingApp.controllers
 
             }
 
-            string msg = _orderRepository.ProcessOrder(orderId);
+            string msg = await _orderRepository.ProcessOrder(orderId);
 
             return Ok(new ApiResponse(true, msg));
         }

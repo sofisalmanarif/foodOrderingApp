@@ -5,11 +5,11 @@ namespace foodOrderingApp.interfaces
 {
     public interface IOrderRepository
     {
-        Order Add(OrderDto newOrder,Guid userId);
+        Task<Order> Add(OrderDto newOrder,Guid userId);
         IEnumerable<Order> GetOrders(Guid restaurantOwnerId);
         IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId);
 
-        string ProcessOrder(Guid orderId);
+        Task<string> ProcessOrder(Guid orderId);
         Object OrderDetails( Guid orderId);
         List<dynamic> MyOrders(Guid userId);
 

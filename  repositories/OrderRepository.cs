@@ -21,7 +21,7 @@ namespace foodOrderingApp.repositories
 
 
         }
-        public Order Add(OrderDto newOrder, Guid userId)
+        public async Task<Order> Add(OrderDto newOrder, Guid userId)
         {
             if (!newOrder.OrderItems.Any())
             {
@@ -77,6 +77,12 @@ namespace foodOrderingApp.repositories
                 };
             }
             _context.Orders.Add(order);
+            //use pushnotification
+            var res = _context.FirebaseTokens.FirstOrDefault(f => f.UserId == order.Restaurant.OwnerId);
+            if (res != null)
+            {
+                await _fireBaseService.SendPushNotification(res.FirebaseToken, "New Order ", $"Your have a new order {order.Id}");
+            }
             _context.SaveChanges();
             return order;
 
@@ -180,7 +186,7 @@ namespace foodOrderingApp.repositories
             return orders;
         }
 
-        public string ProcessOrder(Guid orderId)
+        public async Task<string> ProcessOrder(Guid orderId)
         {
             var order = _context.Orders.Find(orderId);
             if (order == null)
@@ -203,10 +209,16 @@ namespace foodOrderingApp.repositories
             {
                 order.Status = Order.OrderStatus.Delivered;
             }
-            //use pushnotification
+
+            var res = _context.FirebaseTokens.FirstOrDefault(f => f.UserId == order.UserId);
+            if (res != null)
+            {
+                await _fireBaseService.SendPushNotification(res.FirebaseToken, "Order Status", $"Your order is {order.Status}");
+            }
+
             _context.Update(order);
             _context.SaveChanges();
-            return $"Order is {order.Status.ToString()}";
+            return $"Order is {order.Status}";
         }
 
         public IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId)
