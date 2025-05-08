@@ -101,6 +101,8 @@ namespace foodOrderingApp.reprositries
                 restaurant.Description,
                 restaurant.ValidDocument,
                 restaurant.Owner.Phone,
+                restaurant.ImageUrl,
+                restaurant.IsActive,
                 Owner = new
                 {
                     restaurant.Owner.Name,
