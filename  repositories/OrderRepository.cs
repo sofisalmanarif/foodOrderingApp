@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using foodOrderingApp.data;
 using foodOrderingApp.interfaces;
 using foodOrderingApp.models;
@@ -91,18 +87,16 @@ namespace foodOrderingApp.repositories
 
         }
 
-        public IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId)
+        public IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId, int pageSize, int pageNumber)
         {
             return _context.Orders.Include(o => o.OrderItems)
-    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && (o.Status == Order.OrderStatus.Shipped || o.Status == Order.OrderStatus.Processing))
-    .ToList();
+    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && (o.Status == Order.OrderStatus.Shipped || o.Status == Order.OrderStatus.Processing)).Skip((pageNumber - 1) * pageSize).Take(pageSize);
         }
 
-        public IEnumerable<Order> GetOrders(Guid restaurantOwnerId)
+        public IEnumerable<Order> GetOrders(Guid restaurantOwnerId, int pageSize, int pageNumber)
         {
             return _context.Orders.Include(o => o.OrderItems)
-    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Pending)
-    .ToList();
+                .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Pending).Skip((pageNumber-1)* pageSize).Take(pageSize);
         }
 
         public List<dynamic> MyOrders(Guid userId)

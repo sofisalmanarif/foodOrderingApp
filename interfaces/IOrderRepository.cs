@@ -6,8 +6,8 @@ namespace foodOrderingApp.interfaces
     public interface IOrderRepository
     {
         Task<Order> Add(OrderDto newOrder,Guid userId);
-        IEnumerable<Order> GetOrders(Guid restaurantOwnerId);
-        IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId);
+        IEnumerable<Order> GetOrders(Guid restaurantOwnerId, int pageSize,int pageNumber);
+        IEnumerable<Order> GetAcceptedOrders(Guid restaurantOwnerId, int pageSize, int pageNumber);
 
         Task<string> ProcessOrder(Guid orderId);
         Object OrderDetails( Guid orderId);

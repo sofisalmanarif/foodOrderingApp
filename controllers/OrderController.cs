@@ -49,10 +49,10 @@ namespace foodOrderingApp.controllers
         [Authorize(Roles = "Owner")]
         [HttpGet]
 
-        public ActionResult GetOrders()
+        public ActionResult GetOrders([FromQuery] int pageNumber = 1, int pageSize = 5)
         {
             Guid ownerId = HttpContext.User.GetUserIdFromClaims();
-            var orders = _orderRepository.GetOrders(ownerId);
+            var orders = _orderRepository.GetOrders(ownerId, pageSize, pageNumber);
             return Ok(new ApiResponse<IEnumerable<Order>>(true, orders));
         }
 
@@ -61,7 +61,7 @@ namespace foodOrderingApp.controllers
         [Authorize(Roles = "Owner")]
         [HttpGet("accepted-orders")]
 
-        public ActionResult GetAcceptedOrders()
+        public ActionResult GetAcceptedOrders([FromQuery] int pageNumber =1,int pageSize=5)
         {
            Guid ownerId = HttpContext.User.GetUserIdFromClaims();
 
@@ -69,7 +69,7 @@ namespace foodOrderingApp.controllers
             // {
             //     throw new AppException("Invalid Id Format", HttpStatusCode.BadRequest);
             // }
-            var orders = _orderRepository.GetAcceptedOrders(ownerId);
+            var orders = _orderRepository.GetAcceptedOrders(ownerId,pageSize,pageNumber);
             return Ok(new ApiResponse<IEnumerable<Order>>(true, orders));
         }
 
