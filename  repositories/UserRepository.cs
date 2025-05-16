@@ -89,9 +89,9 @@ namespace foodOrderingApp.repositories
             return $"{foundUser.Name} Deleated Sucessfully";
         }
 
-        public IEnumerable<User> GetAll()
+        public IEnumerable<User> GetAll(int pageSize,int pageNumber)
         {
-            return _context.Users.AsNoTracking().ToList();
+            return _context.Users.Skip(pageSize*(pageNumber-1)).Take(pageSize);
         }
 
         public User GetById(Guid id)

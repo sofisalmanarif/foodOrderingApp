@@ -9,7 +9,7 @@ namespace foodOrderingApp.interfaces
     public interface IUserRepository
     {
         User GetById(Guid id);
-        IEnumerable<User> GetAll();
+        IEnumerable<User> GetAll(int pageSize,int pageNumber);
         Guid Add(User user);
         string Update(UpdateUserDto user, Guid userId);
         string Delete(Guid id);

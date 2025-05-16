@@ -56,8 +56,13 @@ namespace foodOrderingApp.controllers
         
         [Authorize(Roles ="Admin")]
         [HttpGet]
-        public ActionResult All(){
-            var users =  _userRepository.GetAll();
+        public ActionResult All([FromQuery] int pageSize, int pageNumber=1)
+        {
+            Console.WriteLine($"PageSize: {pageSize}, PageNumber: {pageNumber}");
+            if(pageNumber<1){
+                throw new AppException("Pagenumber cant be less than 1",HttpStatusCode.BadRequest);
+            }
+            var users =  _userRepository.GetAll(pageSize,pageNumber);
             return Ok(new ApiResponse<IEnumerable<User>>(true ,users));
         }
 
