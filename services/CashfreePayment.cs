@@ -46,7 +46,7 @@ namespace foodOrderingApp.obj
             // Create the order request payload
             var orderRequest = new
             {
-                order_amount = 10,
+                order_amount = amount,
                 order_currency = "INR",
                 order_note = "Some information about the order",
                 customer_details = new
