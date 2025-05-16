@@ -15,7 +15,7 @@ namespace foodOrderingApp.interfaces
         string Delete(Guid id);
         string Verify(Guid id);
         string ToggleOrders(Guid id);
-        IEnumerable<Restaurant> GelAllNotVerified();
+        IEnumerable<Restaurant> GelAllNotVerified(int pageSize,int pageNumber);
         IEnumerable<Restaurant> GetAllRestaurantsByCategory(Guid categoryId);
 
     }

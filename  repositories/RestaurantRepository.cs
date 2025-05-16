@@ -48,7 +48,7 @@ namespace foodOrderingApp.reprositries
 
         }
 
-        public IEnumerable<Restaurant> GelAllNotVerified()
+        public IEnumerable<Restaurant> GelAllNotVerified(int pageSize, int pageNumber)
         {
             var restaurants = _casheService.Get<IEnumerable<Restaurant>>("unverified-restaurants");
             if (restaurants != null && restaurants.Any())
@@ -57,8 +57,8 @@ namespace foodOrderingApp.reprositries
             }
 
             restaurants = _context.Restaurants
-                .Where(r => !r.IsVerified)
-                .ToList();
+                .Where(r => !r.IsVerified).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+
             TimeSpan ttl = TimeSpan.FromMinutes(30);
             _casheService.Set("unverified-restaurants", restaurants, ttl);
             return restaurants;

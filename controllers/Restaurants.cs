@@ -160,9 +160,9 @@ namespace foodOrderingApp.controllers
         [Authorize]
         [Authorize(Roles ="Admin")]
         [HttpGet("requests")]
-        public ActionResult NotVerifiedRestaurants()
+        public ActionResult NotVerifiedRestaurants([FromQuery] int pageSize = 5, int pageNumber = 1)
         {
-            var notVerifiedRestaurants = _restaurantRepository.GelAllNotVerified();
+            var notVerifiedRestaurants = _restaurantRepository.GelAllNotVerified(pageSize,pageNumber);
             return Ok(new ApiResponse<IEnumerable<Restaurant>>(true, notVerifiedRestaurants));
         }
         [Authorize]

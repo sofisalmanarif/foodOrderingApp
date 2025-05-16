@@ -8,6 +8,7 @@ using foodOrderingApp.Models;
 using foodOrderingApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using foodOrderingApp.constants;
 
 
 
@@ -53,15 +54,17 @@ namespace foodOrderingApp.controllers
             var data = _userRepository.Login(user);
             return Ok(new ApiResponse<object>(true,data));
         }
-        
+       
         [Authorize(Roles ="Admin")]
         [HttpGet]
-        public ActionResult All([FromQuery] int pageSize, int pageNumber=1)
+        public ActionResult All([FromQuery] int pageSize =5, int pageNumber =1)
         {
             Console.WriteLine($"PageSize: {pageSize}, PageNumber: {pageNumber}");
             if(pageNumber<1){
                 throw new AppException("Pagenumber cant be less than 1",HttpStatusCode.BadRequest);
             }
+            // int finalPageSize = pageSize ?? AppConstants.DefaultPageSize;
+            // int finalPageNumber = pageNumber ?? AppConstants.DefaultPageNumber;
             var users =  _userRepository.GetAll(pageSize,pageNumber);
             return Ok(new ApiResponse<IEnumerable<User>>(true ,users));
         }
