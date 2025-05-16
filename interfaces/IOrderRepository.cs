@@ -14,7 +14,7 @@ namespace foodOrderingApp.interfaces
         List<dynamic> MyOrders(Guid userId);
 
         object UserOrderHistory(Guid userId);
-        IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId);
+        IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId,int? pageSize,int? pageNumber,DateOnly? ofDate,DateOnly? fromDate,DateOnly? toDate);
 
     }
 }

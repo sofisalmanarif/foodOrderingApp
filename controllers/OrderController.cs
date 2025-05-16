@@ -137,11 +137,11 @@ namespace foodOrderingApp.controllers
 
         [Authorize(Roles = "Owner")]
         [HttpGet("restaurant-order-history")]
-        public ActionResult GetRestaurantsOrderHistory()
+        public ActionResult GetRestaurantsOrderHistory([FromQuery] DateOnly? ofDate, DateOnly? fromDate, DateOnly? toDate, int? pageSize=5, int? pageNumber=1)
         {
             Guid ownerId = HttpContext.User.GetUserIdFromClaims();
 
-            object orders = _orderRepository.RestaurnatOrderHistory(ownerId);
+            object orders = _orderRepository.RestaurnatOrderHistory(ownerId,pageSize,pageNumber,ofDate,fromDate,toDate);
 
             return Ok(new ApiResponse<object>(true, orders));
 

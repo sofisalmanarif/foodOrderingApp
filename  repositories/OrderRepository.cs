@@ -224,12 +224,51 @@ namespace foodOrderingApp.repositories
             return $"Order is {order.Status}";
         }
 
-        public IEnumerable<Order> RestaurnatOrderHistory(Guid restaurantOwnerId)
+        public IEnumerable<Order> RestaurnatOrderHistory(
+       Guid restaurantOwnerId,
+       int? pageSize,
+       int? pageNumber,
+       DateOnly? ofDate,
+       DateOnly? fromDate,
+       DateOnly? toDate)
         {
-            return _context.Orders.Include(o => o.OrderItems)
-                    .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Delivered)
-                    .ToList();
+            var query = _context.Orders
+                .Include(o => o.OrderItems)
+                .Where(o => o.Restaurant != null
+                            && o.Restaurant.OwnerId == restaurantOwnerId
+                            && o.Status == Order.OrderStatus.Delivered);
+
+            // Convert DateOnly to UTC DateTime 
+            if (ofDate.HasValue)
+            {
+                var utcOfDate = DateTime.SpecifyKind(ofDate.Value.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+                query = query.Where(o => o.CreatedAt.Date == utcOfDate.Date);
+            }
+
+            if (fromDate.HasValue)
+            {
+                var utcFromDate = DateTime.SpecifyKind(fromDate.Value.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+                query = query.Where(o => o.CreatedAt.Date >= utcFromDate.Date);
+            }
+
+            if (toDate.HasValue)
+            {
+                var utcToDate = DateTime.SpecifyKind(toDate.Value.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc);
+                query = query.Where(o => o.CreatedAt.Date <= utcToDate.Date);
+            }
+
+            if (pageSize.HasValue && pageNumber.HasValue)
+            {
+                query = query
+                    .Skip((pageNumber.Value - 1) * pageSize.Value)
+                    .Take(pageSize.Value);
+            }
+
+            return query.ToList();
         }
+
+
+
 
         public object UserOrderHistory(Guid userId)
         {
