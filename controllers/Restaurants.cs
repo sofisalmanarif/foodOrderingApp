@@ -120,9 +120,9 @@ namespace foodOrderingApp.controllers
         }
        
         [HttpGet]
-        public ActionResult AllVerifiedRestaurants()
+        public ActionResult AllVerifiedRestaurants([FromQuery] int pageSize = 5, int pageNumber = 1)
         {
-            var allVerifiedRestaurants = _restaurantRepository.GetAll();
+            var allVerifiedRestaurants = _restaurantRepository.GetAll(pageSize,pageNumber);
             return Ok(new ApiResponse<IEnumerable<Restaurant>>(true, allVerifiedRestaurants));
         }
 

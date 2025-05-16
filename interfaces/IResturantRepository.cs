@@ -9,7 +9,7 @@ namespace foodOrderingApp.interfaces
     public interface IResturantRepository
     {
         Object? GetById(Guid id);
-        IEnumerable<Restaurant> GetAll();
+        IEnumerable<Restaurant> GetAll(int pageSize,int pageNumber);
         Restaurant Add(Restaurant restaurant);
         string Update(Restaurant restaurant);
         string Delete(Guid id);

@@ -64,7 +64,7 @@ namespace foodOrderingApp.reprositries
             return restaurants;
         }
 
-        public IEnumerable<Restaurant> GetAll()
+        public IEnumerable<Restaurant> GetAll(int pageSize, int pageNumber)
         {
 
             var restaurants = _casheService.Get<IEnumerable<Restaurant>>("verified-restaurants");
@@ -73,7 +73,7 @@ namespace foodOrderingApp.reprositries
                 Console.WriteLine("Got from Cahce");
                 return restaurants;
             }
-            restaurants =  _context.Restaurants.Where(r => r.IsVerified == true ).ToList();
+            restaurants =  _context.Restaurants.Where(r => r.IsVerified == true ).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
             TimeSpan ttl = TimeSpan.FromMinutes(30);
             _casheService.Set<IEnumerable<Restaurant>>("verified-restaurants", restaurants, ttl);
             return restaurants;
