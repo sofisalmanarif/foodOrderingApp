@@ -38,9 +38,9 @@ namespace foodOrderingApp.controllers
 
             }
 
-            var order = await _orderRepository.Add(newOrder, userId);
+            string msg = await _orderRepository.Add(newOrder, userId);
 
-            return Ok(new ApiResponse<Order>(true, order, "Order Placed Sucessfully"));
+            return Ok(new ApiResponse(true,msg));
 
 
         }

@@ -17,7 +17,7 @@ namespace foodOrderingApp.repositories
 
 
         }
-        public async Task<Order> Add(OrderDto newOrder, Guid userId)
+        public async Task<string> Add(OrderDto newOrder, Guid userId)
         {
             if (!newOrder.OrderItems.Any())
             {
@@ -83,7 +83,7 @@ namespace foodOrderingApp.repositories
                 await _fireBaseService.SendPushNotification(res.FirebaseToken, "New Order ", $"Your have a new order {order.Id}");
             }
             _context.SaveChanges();
-            return order;
+            return "Order placed sucessfully";
 
         }
 

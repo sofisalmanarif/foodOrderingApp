@@ -180,6 +180,8 @@ FirebaseApp.Create(new AppOptions
     Credential = GoogleCredential.FromFile("./foodorderingapp-f2115-firebase-adminsdk-fbsvc-b8e9e9e42b.json"),
 });
 
+
+
 var app = builder.Build();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
