@@ -8,7 +8,7 @@ namespace foodOrderingApp.interfaces
 {
     public interface ICartRepository
     {
-        string Add(CartDto cartDto);
+        string Add(Guid userId,CartDto cartDto);
         object GetUserCart(Guid userId);
         string RemoveItemsFromCart(Guid userId,List<Guid> itemIds);
     }

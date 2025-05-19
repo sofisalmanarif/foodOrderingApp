@@ -21,50 +21,81 @@ namespace foodOrderingApp.repositories.cart
 
 
         }
-        public string Add(CartDto cartDto)
+        public string Add(Guid userId, CartDto cartDto)
         {
-            if (cartDto.UserId == null)
+            // Validate the ItemId
+            var isValidItemId = _context.MenuItems.FirstOrDefault(i => i.Id == cartDto.ItemId);
+            if (isValidItemId == null)
             {
-                return "User ID is required";
-            }
-            var isVAlidItemId =_context.MenuItems.FirstOrDefault(i=>i.Id==cartDto.ItemId);
-            if(isVAlidItemId==null){
-                return "Invlid item data";
+                return "Invalid item data";
             }
 
-            if(cartDto.VariantId !=null){
-                var isDateValid = _context.MenuItemVarients.Where(mi => mi.MenuItemId == cartDto.ItemId && mi.Id == cartDto.VariantId).Any();
-                if (!isDateValid)
+            // Validate the VariantId if provided
+            if (cartDto.VariantId != null)
+            {
+                var isVariantValid = _context.MenuItemVarients
+                    .Where(mi => mi.MenuItemId == cartDto.ItemId && mi.Id == cartDto.VariantId)
+                    .Any();
+
+                if (!isVariantValid)
                 {
-                    return "Invlid varient id";
+                    return "Invalid variant id";
                 }
             }
 
+            // Check if the user already has a cart
             var existingUserCart = _context.Carts
                 .Include(c => c.CartItems)
-                .FirstOrDefault(c => c.UserId == cartDto.UserId);
+                .FirstOrDefault(c => c.UserId == userId);
 
             if (existingUserCart != null)
             {
-                // Add new cart item to existing cart
-                var newCartItem = new CartItem
-                {
-                    ItemId = cartDto.ItemId,
-                    VariantId = cartDto.VariantId,
-                    Quantity = cartDto.Quantity,
-                    CartId = existingUserCart.Id
-                };
+                // Check if the item with the variant already exists in the cart
+                var existingItem = existingUserCart.CartItems
+                    .FirstOrDefault(ci => ci.ItemId == cartDto.ItemId && ci.VariantId == cartDto.VariantId);
 
-                // Add the item directly to the context instead of through the collection
-                _context.CartItems.Add(newCartItem);
+                if (existingItem != null)
+                {
+                    // If the item exists, update the quantity (if quantity is positive, update it, else decrement)
+                    if (cartDto.Quantity > 0)
+                    {
+                        existingItem.Quantity += cartDto.Quantity;
+                    }
+                    else if (cartDto.Quantity == -1 && existingItem.Quantity > 1)
+                    {
+                        existingItem.Quantity -= 1;
+                    }
+                    else if (cartDto.Quantity == -1 && existingItem.Quantity == 1)
+                    {
+                        _context.CartItems.Remove(existingItem);
+                    }
+                    // else
+                    // {
+                    //     _context.CartItems.Remove(existingItem); //remove item from cart i
+                    // }
+
+                    _context.CartItems.Update(existingItem);
+                }
+                else
+                {
+                    // If the item does not exist, create a new cart item
+                    var newCartItem = new CartItem
+                    {
+                        ItemId = cartDto.ItemId,
+                        VariantId = cartDto.VariantId,
+                        Quantity = cartDto.Quantity > 0 ? cartDto.Quantity : 1, // Default to 1 if quantity is not provided
+                        CartId = existingUserCart.Id
+                    };
+
+                    _context.CartItems.Add(newCartItem);
+                }
             }
             else
             {
-                // Create a new cart with the item
+                // If the user does not have a cart, create a new cart
                 var newCart = new Cart
                 {
-                    UserId = cartDto.UserId.Value,
-                    // No need to initialize CartItems here since we're adding separately
+                    UserId = userId,
                 };
 
                 _context.Carts.Add(newCart);
@@ -75,16 +106,20 @@ namespace foodOrderingApp.repositories.cart
                 {
                     ItemId = cartDto.ItemId,
                     VariantId = cartDto.VariantId,
-                    Quantity = cartDto.Quantity,
+                    Quantity = cartDto.Quantity > 0 ? cartDto.Quantity : 1, // Default to 1 if quantity is not provided
                     CartId = newCart.Id
                 };
 
                 _context.CartItems.Add(newCartItem);
             }
 
+            // Save changes to the database
             _context.SaveChanges();
-            return "Item Added Successfully";
+            return "Item Added/Updated Successfully";
         }
+
+
+
 
         public object GetUserCart(Guid userId)
         {

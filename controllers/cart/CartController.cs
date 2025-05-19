@@ -28,24 +28,15 @@ namespace foodOrderingApp.controllers.cart
         }
         [Authorize]
         [HttpPost]
-        public ActionResult AddToCart(CartRequist cartRequist){
+        public ActionResult AddToCart(CartDto cart){
             if (!ModelState.IsValid)
             {
                 return BadRequest(new { message = "Invalid Cart data", errors = ModelState });
             }
-            Console.WriteLine(JsonConvert.SerializeObject(cartRequist, Formatting.Indented));
-
             Guid userId = HttpContext.User.GetUserIdFromClaims();
-            CartDto cartDto = new CartDto(){
-                CartId=cartRequist.CartId,
-                UserId=userId,
-                ItemId = cartRequist.ItemId,
-                VariantId = cartRequist.VariantId,
-                Quantity = cartRequist.Quantity,
-            };
-
-        string msg = _cartRepository.Add(cartDto);
-            return  Ok(new ApiResponse(true ,msg));
+            Console.WriteLine(JsonConvert.SerializeObject(cart, Formatting.Indented));
+            string msg = _cartRepository.Add(userId,cart);
+                return  Ok(new ApiResponse(true ,msg));
 
         }
 
