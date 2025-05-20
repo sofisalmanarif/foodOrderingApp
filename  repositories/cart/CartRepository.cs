@@ -50,31 +50,28 @@ namespace foodOrderingApp.repositories.cart
 
             if (existingUserCart != null)
             {
-                // Check if the item with the variant already exists in the cart
                 var existingItem = existingUserCart.CartItems
                     .FirstOrDefault(ci => ci.ItemId == cartDto.ItemId && ci.VariantId == cartDto.VariantId);
 
                 if (existingItem != null)
                 {
-                    // If the item exists, update the quantity (if quantity is positive, update it, else decrement)
+                    
                     if (cartDto.Quantity > 0)
                     {
                         existingItem.Quantity += cartDto.Quantity;
+                        _context.CartItems.Update(existingItem);
                     }
                     else if (cartDto.Quantity == -1 && existingItem.Quantity > 1)
                     {
                         existingItem.Quantity -= 1;
+                        _context.CartItems.Update(existingItem);
                     }
                     else if (cartDto.Quantity == -1 && existingItem.Quantity == 1)
                     {
                         _context.CartItems.Remove(existingItem);
+                        // _context.SaveChanges();
                     }
-                    // else
-                    // {
-                    //     _context.CartItems.Remove(existingItem); //remove item from cart i
-                    // }
-
-                    _context.CartItems.Update(existingItem);
+                    
                 }
                 else
                 {
@@ -83,7 +80,7 @@ namespace foodOrderingApp.repositories.cart
                     {
                         ItemId = cartDto.ItemId,
                         VariantId = cartDto.VariantId,
-                        Quantity = cartDto.Quantity > 0 ? cartDto.Quantity : 1, // Default to 1 if quantity is not provided
+                        Quantity = cartDto.Quantity > 0 ? cartDto.Quantity : 1,
                         CartId = existingUserCart.Id
                     };
 
@@ -92,28 +89,26 @@ namespace foodOrderingApp.repositories.cart
             }
             else
             {
-                // If the user does not have a cart, create a new cart
                 var newCart = new Cart
                 {
                     UserId = userId,
                 };
 
                 _context.Carts.Add(newCart);
-                _context.SaveChanges(); // Save to generate the Cart ID
+                _context.SaveChanges();
 
-                // Now add the cart item with the proper cart ID
                 var newCartItem = new CartItem
                 {
                     ItemId = cartDto.ItemId,
                     VariantId = cartDto.VariantId,
-                    Quantity = cartDto.Quantity > 0 ? cartDto.Quantity : 1, // Default to 1 if quantity is not provided
+                    Quantity = cartDto.Quantity > 0 ? cartDto.Quantity : 1,
                     CartId = newCart.Id
                 };
 
                 _context.CartItems.Add(newCartItem);
             }
 
-            // Save changes to the database
+            
             _context.SaveChanges();
             return "Item Added/Updated Successfully";
         }
