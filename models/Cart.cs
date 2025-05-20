@@ -20,6 +20,7 @@ namespace foodOrderingApp.models
 
 
         public Guid CartId { get; set; }
+        public Guid? RestaurantId { get; set; }
 
         public Guid ItemId { get; set; } 
 

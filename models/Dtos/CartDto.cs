@@ -8,6 +8,7 @@ namespace foodOrderingApp.models.Dtos
     public class CartDto
     {
         public Guid ItemId { get; set; }
+        public Guid RestaurantId { get; set; }
 
         public Guid? VariantId { get; set; } // optional
 

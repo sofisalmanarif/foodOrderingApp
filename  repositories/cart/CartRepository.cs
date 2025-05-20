@@ -122,6 +122,7 @@ namespace foodOrderingApp.repositories.cart
                 .Where(ci => ci.Cart.UserId == userId)
                 .Select(ci => new
                 {   Id = ci.Id,
+                    RestaurantId = ci.RestaurantId,
                     ItemId = ci.ItemId,
                     ItemName = ci.Item.Name,
                     ImageUrl = ci.Item.ImageUrl,
