@@ -34,8 +34,9 @@ namespace foodOrderingApp.controllers
         }
 
         [HttpGet]
-        public ActionResult AllCoupons(){
-           var coupons =  _discountCouponRepository.AllCoupons();
+        public ActionResult AllCoupons([FromQuery] int pageNumber=1,int pageSize =5)
+        {
+           var coupons =  _discountCouponRepository.AllCoupons(pageNumber,pageSize);
             return Ok(new foodOrderingApp.Models.ApiResponse<IEnumerable<DiscountCoupons>>(true, coupons));
 
         }

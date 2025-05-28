@@ -18,12 +18,12 @@ namespace foodOrderingApp. repositories
             
         }
 
-        public IEnumerable<DiscountCoupons> AllCoupons()
+        public IEnumerable<DiscountCoupons> AllCoupons(int pageNumber,int pageSize)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
             var coupons = _context.DiscountCoupons
-                .Where(dc => dc.ValidTill >= today)
-                .ToList(); 
+                .Where(dc => dc.ValidTill >= today).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                
             return coupons;
         }
 
