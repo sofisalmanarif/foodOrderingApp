@@ -10,7 +10,8 @@ namespace foodOrderingApp.interfaces
     public interface IDiscountCouponRepository
     {
         string Create(DiscountCouponDto coupon);
-        IEnumerable<DiscountCoupons> AllCoupons(int pageNumber ,int pageSize);
+        IEnumerable<DiscountCoupons> AllCoupons(int pageNumber, int pageSize);
         float Verify(VerifyCouponDto coupon);
+        string Delete(Guid id);
     }
 }

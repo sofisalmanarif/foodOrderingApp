@@ -46,6 +46,18 @@ namespace foodOrderingApp. repositories
             return $"Coupon created successfully - [{newCoupon.Code}]";
         }
 
+        public string Delete(Guid id)
+        {
+            var exisingCoupon = _context.DiscountCoupons.Find(id);
+            if (exisingCoupon == null)
+            {
+                throw new KeyNotFoundException("Coupon not found");
+            }
+            _context.DiscountCoupons.Remove(exisingCoupon);
+            _context.SaveChanges();
+            return $"Coupon [{exisingCoupon.Code}]- Deleted sucessfully";
+        }
+
         public float Verify(VerifyCouponDto coupon)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);
