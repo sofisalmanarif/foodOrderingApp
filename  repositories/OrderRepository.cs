@@ -99,7 +99,7 @@ namespace foodOrderingApp.repositories
         public IEnumerable<Order> GetOrders(Guid restaurantOwnerId, int pageSize, int pageNumber)
         {
             return _context.Orders.Include(o => o.OrderItems)
-                .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Pending).Skip((pageNumber-1)* pageSize).Take(pageSize);
+                .Where(o => o.Restaurant != null && o.Restaurant.OwnerId == restaurantOwnerId && o.Status == Order.OrderStatus.Pending).Skip((pageNumber - 1) * pageSize).Take(pageSize);
         }
 
         public List<dynamic> MyOrders(Guid userId)
@@ -222,12 +222,12 @@ namespace foodOrderingApp.repositories
         }
 
         public IEnumerable<Order> RestaurnatOrderHistory(
-       Guid restaurantOwnerId,
-       int? pageSize,
-       int? pageNumber,
-       DateOnly? ofDate,
-       DateOnly? fromDate,
-       DateOnly? toDate)
+            Guid restaurantOwnerId,
+            int? pageSize,
+            int? pageNumber,
+            DateOnly? ofDate,
+            DateOnly? fromDate,
+            DateOnly? toDate)
         {
             var query = _context.Orders
                 .Include(o => o.OrderItems)
@@ -292,5 +292,27 @@ namespace foodOrderingApp.repositories
             }
             return order;
         }
+
+        public async Task<string> DeclineOrder(Guid orderId)
+        {
+            var order = _context.Orders.Find(orderId);
+            if (order == null)
+            {
+                throw new KeyNotFoundException("Invalid Order Id");
+            }
+            order.Status = Order.OrderStatus.Cancelled;
+            _context.Update(order);
+            _context.SaveChanges();
+
+            var res = _context.FirebaseTokens.FirstOrDefault(f => f.UserId == order.UserId);
+            if (res != null)
+            {
+                await _fireBaseService.SendPushNotification(res.FirebaseToken, "Order Status", $"Your order is {order.Status}");
+            }
+            return "Order Cacelled Sucessfully";
+        }
+        
+
+
     }
 }
