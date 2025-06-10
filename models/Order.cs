@@ -38,6 +38,10 @@ namespace foodOrderingApp.models
         public Guid AddressId { get; set; }
 
         public decimal TotalPrice { get; set; }
+        public decimal PayableAmount { get; set; }
+
+        public string? DiscountCoupon { get; set; }
+        public decimal Discount { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
         public PaymentMethod paymentMethod {get;set;} =PaymentMethod.cod;

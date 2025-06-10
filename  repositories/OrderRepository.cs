@@ -55,6 +55,9 @@ namespace foodOrderingApp.repositories
                     PaymentTransactionId = newOrder.PaymentTransactionId,
                     paymentStatus = Order.PaymentStatus.paid,
                     TotalPrice = totalPrice,
+                    Discount = (newOrder.Discount ?? 0),
+                    PayableAmount = totalPrice - (newOrder.Discount ?? 0),
+                    DiscountCoupon = newOrder.CouponCode,
 
                 };
 
